@@ -775,7 +775,7 @@ Doğru bir müdahale ve tek bir parantezle, kötü bir anıdan güçlü bir daya
    <section id="soz" class="relative w-full py-20 sm:py-28 px-5 sm:px-8 lg:px-12" style="background:#F4F1EC;">
     <div class="max-w-4xl mx-auto text-center">
      <div class="fade-in-up"><span class="inline-block text-turuncu font-display font-bold text-sm tracking-[0.3em] uppercase mb-4">Söz Ver</span>
-      <h2 class="font-display font-bold text-lacivert leading-tight" style="font-size:clamp(2rem,5vw,3.2rem);">Bu <span class="text-turuncu">(</span>parantezi<span class="text-turuncu">)</span> kapat.</h2>
+      <h2 class="font-display font-bold text-lacivert leading-tight" style="font-size:clamp(2rem,5vw,3.2rem);">Bu <strong class="text-turuncu">parantezi kapat.</strong> h2>
       <p class="mt-4 text-lacivert/60 font-body max-w-xl mx-auto">Büyük sözlere gerek yok. Küçük bir kararlılık yeter.</p>
      </div>
      <div class="fade-in-up mt-10">
@@ -791,6 +791,7 @@ Doğru bir müdahale ve tek bir parantezle, kötü bir anıdan güçlü bir daya
          </div>
          <button type="submit" class="w-full inline-flex items-center justify-center gap-2 bg-turuncu text-white px-8 py-3.5 rounded-full font-body font-semibold text-base hover:bg-orange-600 transition-all hover:scale-105"> <i data-lucide="check-circle" style="width:18px;height:18px;"></i> Hikâyede Kalmasın Kart Oluştur</button>
          <p class="text-lacivert/60 text-sm">Ad soyad bilgisi sadece ekranda gösterilir. Gizlilik Esastır</p>
+         <p class="mt-4 text-lacivert/70 text-sm"><span id="pledgeCountDisplay">0</span> kişi şimdiye kadar söz verdi.</p>
         </form>
        </div>
        <div id="pledgeDone" class="hidden">
@@ -804,6 +805,7 @@ Doğru bir müdahale ve tek bir parantezle, kötü bir anıdan güçlü bir daya
           <p class="text-lacivert/60 text-sm">Ad Soyad</p>
           <p class="mt-1 font-display font-bold text-lacivert text-2xl" id="pledgeCardName"></p>
           <p class="mt-4 text-lacivert/70 text-sm">Bu kart, hikâyede kalmamaya verdiğin sözün simgesidir.</p>
+          <p class="mt-4 text-lacivert/80 text-sm"><span id="pledgeCountDone">0</span> kişi şu ana kadar söz verdi.</p>
          </div>
         </div>
         <p class="mt-4 font-display font-bold text-turuncu text-lg" id="pledgeHashtag">#HikâyedeKalmasın</p>
@@ -1284,6 +1286,17 @@ const pledgeFormElement = document.getElementById('pledgeFormElement');
 const pledgeContent = document.getElementById('pledgeContent');
 const pledgeDone = document.getElementById('pledgeDone');
 const pledgeCardName = document.getElementById('pledgeCardName');
+const pledgeCountDisplay = document.getElementById('pledgeCountDisplay');
+const pledgeCountDone = document.getElementById('pledgeCountDone');
+
+let pledgeCount = Number(localStorage.getItem('pledgeCount') || 0);
+
+function updatePledgeCountUI() {
+  pledgeCountDisplay.textContent = pledgeCount;
+  pledgeCountDone.textContent = pledgeCount;
+}
+
+updatePledgeCountUI();
 
 pledgeFormElement.addEventListener('submit', (e) => {
   e.preventDefault();
@@ -1297,6 +1310,9 @@ pledgeFormElement.addEventListener('submit', (e) => {
   }
 
   pledgeCardName.textContent = `${firstName} ${lastName}`;
+  pledgeCount += 1;
+  localStorage.setItem('pledgeCount', pledgeCount);
+  updatePledgeCountUI();
   pledgeContent.classList.add('hidden');
   pledgeDone.classList.remove('hidden');
   lucide.createIcons();
