@@ -1,0 +1,1433 @@
+<!doctype html>
+<html lang="tr" class="h-full" style="scroll-behavior:smooth;">
+ <head>
+  <link rel="icon" type="image/png" href="logo.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PARANTEZ — Hikâyede Kalmasın</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="/_sdk/data_sdk.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&amp;family=DM+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            turuncu: '#F98513',
+            mavi: '#223382',
+            lacivert: '#111144',
+            zemin: '#F4F1EC',
+          },
+          fontFamily: {
+            display: ['Oswald', 'sans-serif'],
+            body: ['DM Sans', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+html { height: 100%; }
+body { height: 100%; margin: 0; }
+* { box-sizing: border-box; }
+
+.app-wrapper {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  font-family: 'DM Sans', sans-serif;
+  background: #F4F1EC;
+  color: #111144;
+}
+
+.nav-link {
+  position: relative;
+  transition: color 0.3s;
+  cursor: pointer;
+}
+
+.nav-link.active {
+  color: #F98513;
+}
+
+.nav-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: #F98513;
+}
+
+@keyframes parantezPulse {
+  0%, 100% { opacity: 0.15; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(1.05); }
+}
+
+.parantez-bg {
+  animation: parantezPulse 4s ease-in-out infinite;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in-up {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.fade-in-up.visible {
+  animation: fadeInUp 0.7s ease forwards;
+}
+
+@keyframes heroEntry {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-anim { animation: heroEntry 1s ease forwards; }
+.hero-anim-d1 { animation: heroEntry 1s ease 0.2s forwards; opacity: 0; }
+.hero-anim-d2 { animation: heroEntry 1s ease 0.4s forwards; opacity: 0; }
+.hero-anim-d3 { animation: heroEntry 1s ease 0.6s forwards; opacity: 0; }
+
+@keyframes scrollDown {
+  0%, 100% { transform: translateY(0); opacity: 1; }
+  50% { transform: translateY(10px); opacity: 0.5; }
+}
+
+.scroll-indicator {
+  animation: scrollDown 2s ease-in-out infinite;
+}
+
+.story-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.story-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(17,17,68,0.12);
+}
+
+@keyframes float1 {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(15px, -20px) rotate(5deg); }
+  66% { transform: translate(-10px, -10px) rotate(-3deg); }
+}
+
+@keyframes float2 {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(-20px, 15px) rotate(-5deg); }
+  66% { transform: translate(10px, 10px) rotate(3deg); }
+}
+
+.float-1 { animation: float1 8s ease-in-out infinite; }
+.float-2 { animation: float2 10s ease-in-out infinite; }
+
+.stat-number {
+  text-shadow: 0 0 40px rgba(249,133,19,0.3);
+}
+
+.mobile-menu {
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+}
+
+.mobile-menu.open {
+  transform: translateX(0);
+}
+
+.bullying-tab-content {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1), transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.bullying-tab-content.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.bullying-tab-content.hidden {
+  display: none;
+}
+
+.bullying-tab-content > * {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1), transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.bullying-tab-content.active > * {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.bullying-tab-content .p-4 {
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease;
+}
+
+.bullying-tab-content .p-4:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(17,17,68,0.12);
+}
+
+.bullying-tab-btn {
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), background 0.35s ease, color 0.35s ease, box-shadow 0.35s ease;
+}
+
+.bullying-tab-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(17,17,68,0.1);
+}
+
+.report-channel-content {
+  transition: opacity 0.3s ease;
+}
+
+.report-channel-content.hidden {
+  display: none;
+}
+
+textarea {
+  line-height: 1.5;
+}
+
+.info-comparison-row {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .info-comparison-row {
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: center;
+  }
+}
+
+.info-comparison-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 24rem;
+  height: 100%;
+}
+  </style>
+  <style>body { box-sizing: border-box; }</style>
+ </head>
+ <body class="h-full">
+  <div class="app-wrapper" id="appWrapper"><!-- STICKY NAV -->
+   <nav id="mainNav" class="fixed top-0 left-0 w-full z-50 transition-all duration-300" style="background:rgba(244,241,236,0.92);backdrop-filter:blur(12px);border-bottom:1px solid rgba(17,17,68,0.06);">
+    <div class="px-4 sm:px-6 flex items-center h-14 sm:h-16 justify-between relative">
+      <a href="#hero" class="flex-shrink-0 md:mr-8 md:static absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 md:transform-none md:left-auto md:top-auto md:translate-x-0 md:translate-y-0">
+        <img src="logo.png" alt="Parantez Logo" class="h-16 md:h-28 w-auto">
+      </a>
+     <div class="hidden md:flex items-center justify-center gap-2 lg:gap-3 text-xs lg:text-sm font-medium font-body flex-1"><a href="#problem" class="nav-link text-lacivert hover:text-turuncu whitespace-nowrap px-1.5">Neden?</a> <a href="#why-slogan" class="nav-link text-lacivert hover:text-turuncu whitespace-nowrap px-1.5">Slogan</a> <a href="#zorbalik-turleri" class="nav-link text-lacivert hover:text-turuncu whitespace-nowrap px-1.5">Farkındalık</a> <a href="#veriler" class="nav-link text-lacivert hover:text-turuncu whitespace-nowrap px-1.5">Veriler</a> <a href="#hikayeler" class="nav-link text-lacivert hover:text-turuncu whitespace-nowrap px-1.5">Hikâyeler</a> <a href="#forum" class="nav-link text-lacivert hover:text-turuncu whitespace-nowrap px-1.5">Forum</a> <a href="#ne-yapabilirsin" class="nav-link text-lacivert hover:text-turuncu whitespace-nowrap px-1.5">Ne Yapabilirim?</a> <a href="#final-cta" class="nav-link text-lacivert hover:text-turuncu whitespace-nowrap px-1.5">Aksiyon</a>
+     </div>
+     <div class="hidden md:flex items-center gap-3"><a href="#bildir" class="bg-turuncu text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-orange-600 transition-colors">Güvenli Bildir</a>
+     </div><button id="mobileMenuBtn" class="md:hidden p-2 text-lacivert" aria-label="Menüyü aç"> <i data-lucide="menu" style="width:24px;height:24px;"></i> </button>
+    </div>
+   </nav><!-- MOBILE MENU -->
+   <div id="mobileMenu" class="mobile-menu fixed top-0 right-0 w-72 h-full z-[60] bg-lacivert text-white flex flex-col">
+    <div class="flex items-center justify-between px-6 py-5"><span class="font-display text-xl font-bold">PARANTEZ</span> <button id="mobileMenuClose" class="p-2" aria-label="Menüyü kapat"> <i data-lucide="x" style="width:24px;height:24px;"></i> </button>
+    </div>
+    <div class="flex flex-col gap-1 px-6 mt-4"><a href="#problem" class="mobile-nav-link py-3 text-lg font-body border-b border-white/10 hover:text-turuncu transition-colors">Neden?</a> <a href="#why-slogan" class="mobile-nav-link py-3 text-lg font-body border-b border-white/10 hover:text-turuncu transition-colors">Slogan</a> <a href="#zorbalik-turleri" class="mobile-nav-link py-3 text-lg font-body border-b border-white/10 hover:text-turuncu transition-colors">Zorbalık Türleri</a> <a href="#veriler" class="mobile-nav-link py-3 text-lg font-body border-b border-white/10 hover:text-turuncu transition-colors">Veriler</a> <a href="#hikayeler" class="mobile-nav-link py-3 text-lg font-body border-b border-white/10 hover:text-turuncu transition-colors">Hikâyeler</a> <a href="#forum" class="mobile-nav-link py-3 text-lg font-body border-b border-white/10 hover:text-turuncu transition-colors">Forum</a> <a href="#ne-yapabilirsin" class="mobile-nav-link py-3 text-lg font-body border-b border-white/10 hover:text-turuncu transition-colors">Ne Yapabilirim?</a> <a href="#final-cta" class="mobile-nav-link py-3 text-lg font-body border-b border-white/10 hover:text-turuncu transition-colors">Aksiyona Geç</a> <a href="#bildir" class="mobile-nav-link py-3 text-lg font-body border-b border-white/10 hover:text-turuncu transition-colors">Bildir</a>
+    </div>
+    <div class="px-6 mt-8"><a href="#bildir" class="mobile-nav-link block text-center bg-turuncu text-white px-6 py-3 rounded-full font-semibold text-lg hover:bg-orange-600 transition-colors">Güvenli Bildir</a>
+    </div>
+   </div>
+   <div id="mobileOverlay" class="fixed inset-0 z-[55] bg-black/40 opacity-0 pointer-events-none transition-opacity duration-300"></div><!-- ===== HERO ===== -->
+   <section id="hero" class="relative w-full overflow-hidden pt-24 sm:pt-32 lg:pt-40 pb-20 sm:pb-28 lg:pb-36 px-5 sm:px-8 lg:px-12" style="background:linear-gradient(160deg,#111144 0%,#1a1a5c 40%,#223382 100%);">
+    <div class="absolute inset-0 pointer-events-none overflow-hidden"><span class="float-1 absolute text-white/5 font-display" style="font-size:clamp(200px,30vw,600px);top:-5%;left:-10%;line-height:1;">(</span> <span class="float-2 absolute text-turuncu/10 font-display" style="font-size:clamp(200px,30vw,600px);bottom:-10%;right:-10%;line-height:1;">)</span> <span class="float-2 absolute text-white/[0.03] font-display" style="font-size:clamp(100px,15vw,300px);top:20%;right:5%;line-height:1;">(</span> <span class="float-1 absolute text-turuncu/[0.06] font-display" style="font-size:clamp(80px,10vw,250px);bottom:25%;left:5%;line-height:1;">)</span>
+     <div class="absolute inset-0" style="background-image:linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.02) 1px, transparent 1px);background-size:60px 60px;"></div>
+    </div>
+    <div class="relative z-10 flex flex-col items-center justify-center text-center max-w-4xl mx-auto">
+     <div class="hero-anim mb-6 sm:mb-8">
+      <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/20 bg-white/5 backdrop-blur-sm"><span class="w-2 h-2 rounded-full bg-turuncu animate-pulse"></span> <span class="text-white/70 text-xs sm:text-sm font-body tracking-widest uppercase" id="hashtagDisplay">#HikâyedeKalmasın</span>
+      </div>
+     </div>
+     <h1 class="hero-anim-d1 font-display font-bold text-white leading-[0.9] tracking-tight" style="font-size:clamp(3rem,10vw,6rem);" id="heroTitle">HİKÂYEDE<br><span class="text-turuncu">KALMASIN</span></h1>
+     <p class="hero-anim-d2 mt-5 sm:mt-6 font-display text-white/80 font-medium" style="font-size:clamp(1rem,2.5vw,1.3rem);" 
+     <p class="hero-anim-d2 mt-4 max-w-2xl text-white/60 font-body leading-relaxed" style="font-size:clamp(0.875rem,1.5vw,1rem);">İzleyip geçtiğin şey, bir başkasının hayatında kalıcı bir iz olabilir. Sessiz kalma. Fark et, durdur, bildir.</p>
+     <div class="hero-anim-d3 flex flex-col sm:flex-row gap-3 sm:gap-4 mt-8 sm:mt-10 justify-center"><a href="#ne-yapabilirsin" class="inline-flex items-center justify-center gap-3 bg-turuncu text-white px-7 py-3.5 rounded-full font-body font-semibold text-base hover:bg-orange-600 transition-all hover:scale-105">
+
+  <i data-lucide="lightbulb" class="w-5 h-5 text-white"></i>
+  Ne Yapabilirim?
+
+</a> <a href="#bildir" class="inline-flex items-center justify-center gap-2 bg-white/10 text-white border border-white/20 px-7 py-3.5 rounded-full font-body font-semibold text-base hover:bg-white/20 transition-all backdrop-blur-sm"> <i data-lucide="shield" style="width:18px;height:18px;"></i> Güvenli Bildir </a>
+     </div>
+     <div class="scroll-indicator mt-12 sm:mt-16 flex flex-col items-center gap-1 text-white/40"><span class="text-xs font-body tracking-wider">keşfet</span> <i data-lucide="chevron-down" style="width:20px;height:20px;"></i>
+     </div>
+    </div>
+   </section><!-- ===== PROBLEM SECTION ===== -->
+   <section id="problem" class="relative w-full py-20 sm:py-28 px-5 sm:px-8 lg:px-12" style="background:#F4F1EC;">
+    <div class="max-w-7xl mx-auto">
+     <div class="fade-in-up"><span class="inline-block text-turuncu font-display font-bold text-sm tracking-[0.3em] uppercase mb-4">Neden Biz?</span>
+      <h2 class="font-display font-bold text-lacivert leading-[1.05]" style="font-size:clamp(2rem,5vw,3.5rem);" id="problemMainTitle">O an geçip gitse de<br>
+        etkisi <span class="text-turuncu">yıllar kalıyor.</span></h2>
+     </div>
+     <div class="fade-in-up mt-10 sm:mt-14 grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12">
+      <div>
+       <p class="text-lacivert/80 font-body leading-relaxed text-base sm:text-lg">İzleyici Modu Bir Reflekstir: Dijital akışın hızına alışmak, gerçek hayattaki zorbalığa karşı da istemeden bir duyarsızlık perdesi oluşturabiliyor.</p>
+       <p class="mt-4 text-lacivert/80 font-body leading-relaxed text-base sm:text-lg">Sessizliğin Sebeplerini Biliyoruz: Sessiz kalmak çoğu zaman bir tercih değil; etiketlenme kaygısı veya <strong class="text-lacivert">"tek başıma neyi değiştirebilirim?"</strong> düşüncesinin getirdiği doğal bir savunma mekanizmasıdır.</strong> </p>
+      </div>
+      <div>
+       <p class="text-lacivert/80 font-body leading-relaxed text-base sm:text-lg">Sistemi Güncelle: Parantez, seni bu baskıdan kurtarmak için var. Anonim bildirim altyapımızla, ispiyoncu değil; arkadaş ortamını iyileştiren ve hikâyeyi değiştiren <strong class="text-lacivert">asıl güç sensin.</strong></p>
+       <div class="mt-6 p-5 rounded-2xl bg-lacivert/5 border-l-4 border-turuncu">
+        <p class="text-lacivert font-body font-medium text-base italic">Konuşmak her zaman kolay değildir; ama doğru bir sistemle atılan tek bir adım, herkes için hikâyeyi değiştirir.</p>
+       </div>
+      </div>
+     </div>
+     <div class="fade-in-up mt-14 sm:mt-20 grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="bg-white rounded-3xl p-7 sm:p-8 border border-turuncu/20 relative overflow-hidden">
+       <div class="absolute top-0 right-0 w-24 h-24 bg-turuncu/5 rounded-bl-[3rem]"></div>
+       <div class="w-12 h-12 rounded-2xl bg-turuncu/10 mb-4 relative z-10 flex items-center justify-center">
+         <i data-lucide="alert-triangle" class="w-6 h-6 text-turuncu"></i>
+       </div>
+       <h3 class="font-display font-bold text-lacivert text-xl relative z-10">Problem</h3>
+       <p class="mt-3 text-lacivert/70 font-body leading-relaxed text-sm">Zorbalık bazen 15 saniyelik bir "hikâye" hızıyla tüketilip geçiliyor. Görülüyor ama akışın hızı nedeniyle durdurulamıyor. İzleyici modu ve dijital duyarsızlaşma, gerçek sorumluluk hissinin önüne geçebiliyor. </p>
+      </div>
+      <div class="bg-lacivert rounded-3xl p-7 sm:p-8 border border-lacivert relative overflow-hidden text-white">
+       <div class="absolute top-0 right-0 w-24 h-24 bg-turuncu/10 rounded-bl-[3rem]"></div>
+       <div class="w-12 h-12 rounded-2xl bg-turuncu/20 mb-4 relative z-10 flex items-center justify-center">
+         <i data-lucide="shield-check" class="w-6 h-6 text-white"></i>
+       </div>
+       <h3 class="font-display font-bold text-white text-xl relative z-10">Çözüm</h3>
+       <p class="mt-3 text-white/80 font-body leading-relaxed text-sm">Tanık olan öğrenciyi pasif izleyici refleksinden çıkarıp, sistemi iyileştiren onarıcı bir güce dönüştürüyoruz. Kimliğini koruyan güvenli bir altyapıyla; fark etmeni, yanında durmanı ve hikâyeyi güncellemeni sağlıyoruz.</p>
+      </div>
+     </div>
+     <div class="fade-in-up mt-14 sm:mt-20 info-comparison-row">
+      <div class="info-comparison-card flex-1 max-w-sm bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-lacivert/5 text-center">
+       <div>
+        <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-turuncu/10 flex items-center justify-center">
+          <i data-lucide="monitor" class="w-8 h-8 text-turuncu"></i>
+        </div>
+        <p class="font-display font-bold text-lacivert text-lg">Ekranda</p>
+        <p class="font-body text-lacivert/60 mt-2">İzlenip geçilen, dijitalin uçucu doğasında kaybolan 15 saniye.
+Bir sonraki içerikle beraber hafızadan silinen bir an.</p>
+       </div>
+      </div>
+      <div class="flex-shrink-0 self-center text-turuncu font-display font-bold text-3xl hidden lg:block">
+       ≠
+      </div>
+      <div class="flex-shrink-0 self-center text-turuncu font-display font-bold text-xl lg:hidden">
+       ≠
+      </div>
+      <div class="info-comparison-card flex-1 max-w-sm bg-lacivert rounded-3xl p-6 sm:p-8 shadow-sm text-center text-white">
+       <div>
+        <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-white/10 flex items-center justify-center">
+          <i data-lucide="heart" class="w-8 h-8 text-white"></i>
+        </div>
+        <p class="font-display font-bold text-lg">Gerçekte </p>
+        <p class="font-body text-white/70 mt-2">Bir insanın hayatında yer edinen, önemsenmeye ihtiyaç duyulan bir gerçeklik.
+Doğru bir müdahale ve tek bir parantezle, kötü bir anıdan güçlü bir dayanışma hikâyesine dönüşebilecek bir süreç.</p>
+       </div>
+      </div>
+     </div>
+    </div>
+   </section><!-- ===== WHY SLOGAN SECTION ===== -->
+   <section id="why-slogan" class="relative w-full py-20 sm:py-28 px-5 sm:px-8 lg:px-12" style="background:linear-gradient(135deg,#223382 0%,#1a1a5c 100%);">
+    <div class="max-w-7xl mx-auto">
+     <div class="fade-in-up text-center"><span class="inline-block text-turuncu font-display font-bold text-sm tracking-[0.3em] uppercase mb-4">Kampanyanın Kalbi</span>
+      <h2 class="font-display font-bold text-white leading-tight" style="font-size:clamp(2rem,5vw,3.2rem);" id="whySloganTitle"><span class="text-turuncu">"</span>Hikâyede Kalmasın<span class="text-turuncu">"</span> neden bu kadar önemli?</h2>
+      <p class="mt-4 text-white/60 font-body max-w-2xl mx-auto">Bir olay anlatılmadığında, görünür kılınmadığında ve durdurulmadığında zamanla sadece bir hikâyeye dönüşür. Biz bu kampanyada zorbalığın bir hikâye olarak kalmasını değil, gerçek hayatta ciddiye alınmasını ve çözülmesini istiyoruz.</p>
+     </div>
+     <div class="fade-in-up mt-14 sm:mt-20 flex flex-col md:flex-row items-center justify-center gap-6 md:gap-4">
+      <div class="flex-1 max-w-sm">
+       <div class="bg-white/10 backdrop-blur-sm rounded-3xl p-6 sm:p-8 border border-white/10 text-center text-white h-full flex flex-col">
+        <div class="w-16 h-16 rounded-full bg-turuncu/20 flex items-center justify-center mx-auto mb-5 font-display font-bold text-2xl">
+         1
+        </div>
+        <h3 class="font-display font-bold text-lg mb-2">Görüldü</h3>
+        <p class="text-white/70 font-body text-sm leading-relaxed flex-grow">Zorbalık yaşandı. Tanıklar vardı. Gözler görmüş.</p>
+       </div>
+      </div>
+      <div class="hidden md:flex flex-shrink-0">
+       <div class="text-turuncu/30 font-display text-4xl">
+        →
+       </div>
+      </div>
+      <div class="flex-1 max-w-sm">
+       <div class="bg-white/5 backdrop-blur-sm rounded-3xl p-6 sm:p-8 border border-white/10 text-center text-white h-full flex flex-col">
+        <div class="w-16 h-16 rounded-full bg-turuncu/20 flex items-center justify-center mx-auto mb-5 font-display font-bold text-2xl">
+         2
+        </div>
+        <h3 class="font-display font-bold text-lg mb-2">Geçildi</h3>
+        <p class="text-white/70 font-body text-sm leading-relaxed flex-grow">Kimse konuşmadı. Herkes sustu. O an geçip gitti.</p>
+       </div>
+      </div>
+      <div class="hidden md:flex flex-shrink-0">
+       <div class="text-turuncu/30 font-display text-4xl">
+        →
+       </div>
+      </div>
+      <div class="flex-1 max-w-sm">
+       <div class="bg-turuncu/10 backdrop-blur-sm rounded-3xl p-6 sm:p-8 border border-turuncu/20 text-center text-white h-full flex flex-col">
+        <div class="w-16 h-16 rounded-full bg-turuncu/30 flex items-center justify-center mx-auto mb-5 font-display font-bold text-2xl">
+         3
+        </div>
+        <h3 class="font-display font-bold text-lg mb-2">Kalıcılaştı</h3>
+        <p class="text-white/80 font-body text-sm leading-relaxed flex-grow">O an geçti sanıldı. Ama etkisi geçmedi. Bir hikâyeye dönüştü.</p>
+       </div>
+      </div>
+     </div>
+     <div class="fade-in-up mt-14 text-center">
+      <div class="inline-block px-8 py-6 rounded-3xl bg-turuncu border-2 border-turuncu">
+       <p class="font-display font-bold text-white text-lg sm:text-2xl">Bir şey gördüğünde<br>
+         sadece izleme.</p>
+       <p class="mt-3 text-white/90 font-body text-base"><span class="text-turuncu font-bold">(</span>Parantez<span class="text-turuncu font-bold">)</span> ol.</p>
+      </div>
+     </div>
+    </div>
+   </section><!-- ===== BULLYING TYPES SECTION ===== -->
+   <section id="zorbalik-turleri" class="relative w-full py-20 sm:py-28 px-5 sm:px-8 lg:px-12" style="background:#F4F1EC;">
+    <div class="max-w-7xl mx-auto">
+     <div class="fade-in-up text-center"><span class="inline-block text-turuncu font-display font-bold text-sm tracking-[0.3em] uppercase mb-4">Farkındalık</span>
+      <h2 class="font-display font-bold text-lacivert leading-tight" style="font-size:clamp(2rem,5vw,3.2rem);">Zorbalığın <span class="text-turuncu">4 yüzü</span></h2>
+      <p class="mt-4 text-lacivert/60 font-body max-w-2xl mx-auto">Zorbalık sadece fiziksel değildir. Bazen görünmez olduğu için daha kolay normalleşir. Hepsini tanımak önemli.</p>
+     </div>
+     <div class="fade-in-up mt-12 flex flex-wrap gap-3 justify-center mb-8"><button class="bullying-tab-btn active px-6 py-3 rounded-full font-body font-semibold text-sm transition-all" data-tab="0" style="background:#F98513;color:white;">Fiziksel</button> <button class="bullying-tab-btn px-6 py-3 rounded-full font-body font-semibold text-sm transition-all border border-lacivert/20 text-lacivert hover:border-turuncu" data-tab="1">Sosyal</button> <button class="bullying-tab-btn px-6 py-3 rounded-full font-body font-semibold text-sm transition-all border border-lacivert/20 text-lacivert hover:border-turuncu" data-tab="2">Sözel</button> <button class="bullying-tab-btn px-6 py-3 rounded-full font-body font-semibold text-sm transition-all border border-lacivert/20 text-lacivert hover:border-turuncu" data-tab="3">Dijital</button>
+     </div>
+     <div class="fade-in-up w-full">
+      <div class="bullying-tab-content active bg-white rounded-3xl p-8 sm:p-10 border border-lacivert/5 relative">
+       <div class="absolute top-6 left-6 w-16 h-16 rounded-2xl bg-turuncu/8 shadow-sm"></div>
+       <div class="flex flex-col sm:flex-row gap-8 sm:gap-10">
+        <div class="flex-shrink-0">
+         <div class="w-20 h-20 rounded-3xl bg-turuncu/10 flex items-center justify-center flex-shrink-0">
+           <i data-lucide="box" class="w-10 h-10 text-turuncu"></i>
+         </div>
+        </div>
+        <div class="flex-1">
+         <h3 class="font-display font-bold text-lacivert text-3xl mb-4">Fiziksel Zorbalık</h3>
+         <p class="text-lacivert/80 font-body leading-relaxed mb-6">Vücuda veya kişisel alana karşı yapılan her tür olumsuz eylem. Çoğu zaman görünür olur ama bazen küçük, normal gibi görünen hareketlerle de gerçekleşir.</p>
+         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+          <div class="p-4 bg-lacivert/5 rounded-2xl">
+           <p class="text-turuncu font-display font-bold text-sm mb-2">İtilme, çarpma</p>
+           <p class="text-lacivert/70 font-body text-sm">Birine kasten çarpmak, itip düşürtmek</p>
+          </div>
+          <div class="p-4 bg-lacivert/5 rounded-2xl">
+           <p class="text-turuncu font-display font-bold text-sm mb-2">Eşyaya zarar verme</p>
+           <p class="text-lacivert/70 font-body text-sm">Çantasını gizlemek, kitabını yırtmak</p>
+          </div>
+          <div class="p-4 bg-lacivert/5 rounded-2xl">
+           <p class="text-turuncu font-display font-bold text-sm mb-2">Kişisel alan ihlali</p>
+           <p class="text-lacivert/70 font-body text-sm">İstemeden dokunmak, rahatsız etmek</p>
+          </div>
+          <div class="p-4 bg-lacivert/5 rounded-2xl">
+           <p class="text-turuncu font-display font-bold text-sm mb-2">Küçük düşürücü hareketler</p>
+           <p class="text-lacivert/70 font-body text-sm">Paçasını çekerek aşağılamak</p>
+          </div>
+         </div>
+         <div class="p-5 rounded-2xl bg-turuncu/8 border-l-4 border-turuncu">
+          <p class="text-lacivert font-body text-sm"><strong>Dikkat:</strong> Fiziksel zorbalık belki en kolay fark edileni ama bu yüzden yanlış anlama riski de taşıyor. Bir şaka mı yoksa fiziksel zorbalık mı olduğuna bak. Mağdur rahatsız görünüyorsa, o zorbalık demektir.</p>
+         </div>
+        </div>
+       </div>
+      </div>
+      <div class="bullying-tab-content hidden bg-white rounded-3xl p-8 sm:p-10 border border-lacivert/5 relative">
+       <div class="absolute top-6 left-6 w-16 h-16 rounded-2xl bg-turuncu/8"></div>
+       <div class="flex flex-col sm:flex-row gap-8 sm:gap-10">
+        <div class="flex-shrink-0">
+         <div class="w-20 h-20 rounded-3xl bg-turuncu/10 flex items-center justify-center">
+           <i data-lucide="users" class="w-10 h-10 text-turuncu"></i>
+         </div>
+        </div>
+        <div class="flex-1">
+         <h3 class="font-display font-bold text-lacivert text-3xl mb-4">Sosyal Zorbalık</h3>
+         <p class="text-lacivert/80 font-body leading-relaxed mb-6">İlişkileri, itibarı ve sosyal yaşamı hedef alan zorbalık. Çoğu zaman gözle görülmez ama kalp üzerindeki etkisi çok derindir.</p>
+         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+          <div class="p-4 bg-lacivert/5 rounded-2xl">
+           <p class="text-turuncu font-display font-bold text-sm mb-2">Dışlama</p>
+           <p class="text-lacivert/70 font-body text-sm">Gruba almamak, etkinliklere davet etmemek</p>
+          </div>
+          <div class="p-4 bg-lacivert/5 rounded-2xl">
+           <p class="text-turuncu font-display font-bold text-sm mb-2">Dedikodu</p>
+           <p class="text-lacivert/70 font-body text-sm">Hakkında yalan söylenti yaymak, iftira</p>
+          </div>
+          <div class="p-4 bg-lacivert/5 rounded-2xl">
+           <p class="text-turuncu font-display font-bold text-sm mb-2">Manipülasyon</p>
+           <p class="text-lacivert/70 font-body text-sm">Arkadaşlarını karşısına döndürmek</p>
+          </div>
+          <div class="p-4 bg-lacivert/5 rounded-2xl">
+           <p class="text-turuncu font-display font-bold text-sm mb-2">Görmezden gelme</p>
+           <p class="text-lacivert/70 font-body text-sm">Sesini duymamak, sohbetleri kesme</p>
+          </div>
+         </div>
+         <div class="p-5 rounded-2xl bg-turuncu/8 border-l-4 border-turuncu">
+          <p class="text-lacivert font-body text-sm"><strong>Dikkat:</strong> Sosyal zorbalık en tehlikelisi olabilir çünkü kişi yalnız hissetmeye başlar. Birinin aniden gruptan dışlanması, hakkında söylenti yayılması — bunlar küçük şeyler değil, çok ağır travmalar.</p>
+         </div>
+        </div>
+       </div>
+      </div>
+      <div class="bullying-tab-content hidden bg-white rounded-3xl p-8 sm:p-10 border border-lacivert/5 relative">
+       <div class="absolute top-6 left-6 w-16 h-16 rounded-2xl bg-turuncu/8"></div>
+       <div class="flex flex-col sm:flex-row gap-8 sm:gap-10">
+        <div class="flex-shrink-0">
+         <div class="w-20 h-20 rounded-3xl bg-turuncu/10 flex items-center justify-center">
+           <i data-lucide="message-circle" class="w-10 h-10 text-turuncu"></i>
+         </div>
+        </div>
+        <div class="flex-1">
+         <h3 class="font-display font-bold text-lacivert text-3xl mb-4">Sözel Zorbalık</h3>
+         <p class="text-lacivert/80 font-body leading-relaxed mb-6">Kelimelerle yapılan zarar. Bazı şeyler iyileşmez, söz izini kalır. En basit sözler bile, yıllar sonra hatırlanır ve kalp üzerinde ağır baskı bırakır.</p>
+         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+          <div class="p-4 bg-lacivert/5 rounded-2xl">
+           <p class="text-turuncu font-display font-bold text-sm mb-2">Lakap takma</p>
+           <p class="text-lacivert/70 font-body text-sm">Kötü, aşağılayıcı isimler vermek</p>
+          </div>
+          <div class="p-4 bg-lacivert/5 rounded-2xl">
+           <p class="text-turuncu font-display font-bold text-sm mb-2">Alay</p>
+           <p class="text-lacivert/70 font-body text-sm">Giydiğini, konuşuşunu, davranışını alay konusu yapmak</p>
+          </div>
+          <div class="p-4 bg-lacivert/5 rounded-2xl">
+           <p class="text-turuncu font-display font-bold text-sm mb-2">Aşağılama</p>
+           <p class="text-lacivert/70 font-body text-sm">Becerilerini, yeteneklerini küçümsemek</p>
+          </div>
+          <div class="p-4 bg-lacivert/5 rounded-2xl">
+           <p class="text-turuncu font-display font-bold text-sm mb-2">Tehdit</p>
+           <p class="text-lacivert/70 font-body text-sm">Korkutmak, şantaj yapmak</p>
+          </div>
+         </div>
+         <div class="p-5 rounded-2xl bg-turuncu/8 border-l-4 border-turuncu">
+          <p class="text-lacivert font-body text-sm"><strong>Dikkat:</strong> Sözel zorbalık "sadece şaka" olarak normalleştirilir. Ama mağdur ağlasa da gülse de, eğer huzursuz görünüyorsa — o, zorbalıktır.</p>
+         </div>
+        </div>
+       </div>
+      </div>
+      <div class="bullying-tab-content hidden bg-white rounded-3xl p-8 sm:p-10 border border-lacivert/5 relative">
+       <div class="absolute top-6 left-6 w-16 h-16 rounded-2xl bg-turuncu/8"></div>
+       <div class="flex flex-col sm:flex-row gap-8 sm:gap-10">
+        <div class="flex-shrink-0">
+         <div class="w-20 h-20 rounded-3xl bg-turuncu/10 flex items-center justify-center">
+           <i data-lucide="smartphone" class="w-10 h-10 text-turuncu"></i>
+         </div>
+        </div>
+        <div class="flex-1">
+         <h3 class="font-display font-bold text-lacivert text-3xl mb-4">Dijital Zorbalık</h3>
+         <p class="text-lacivert/80 font-body leading-relaxed mb-6">Ekran arkasında yapılan zarar. En hızlı yayılır, silinmesi en zordur. Dijital ortamda attığın her şey sonsuza kadar kalabilir.</p>
+         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+          <div class="p-4 bg-lacivert/5 rounded-2xl">
+           <p class="text-turuncu font-display font-bold text-sm mb-2">Dedikodu yayma</p>
+           <p class="text-lacivert/70 font-body text-sm">Yalan söylenti WhatsApp, TikTok, Instagram'da yayma</p>
+          </div>
+          <div class="p-4 bg-lacivert/5 rounded-2xl">
+           <p class="text-turuncu font-display font-bold text-sm mb-2">İzinsiz paylaşım</p>
+           <p class="text-lacivert/70 font-body text-sm">Kişinin fotoğrafını, videosunu, sözünü izin olmadan paylaşmak</p>
+          </div>
+          <div class="p-4 bg-lacivert/5 rounded-2xl">
+           <p class="text-turuncu font-display font-bold text-sm mb-2">Rahatsız edici mesaj</p>
+           <p class="text-lacivert/70 font-body text-sm">Tehdit, küfür, cinsel içerik barındıran mesajlar</p>
+          </div>
+          <div class="p-4 bg-lacivert/5 rounded-2xl">
+           <p class="text-turuncu font-display font-bold text-sm mb-2">İfşa (revenge porn)</p>
+           <p class="text-lacivert/70 font-body text-sm">Özel görüntü, video paylaşarak utandırmak</p>
+          </div>
+         </div>
+         <div class="p-5 rounded-2xl bg-turuncu/8 border-l-4 border-turuncu">
+          <p class="text-lacivert font-body text-sm"><strong>Dikkat:</strong> Dijital zorbalık en kolay yayılan türü. Saniyeler içinde binlerce kişiye ulaşabilir. Paylaşmadan önce sor: "Bu senin için güvenli bir paylaşım mı?"</p>
+         </div>
+        </div>
+       </div>
+      </div>
+     </div>
+    </div>
+   </section><!-- ===== DATA / VERİLER ===== -->
+   <section id="veriler" class="relative w-full py-20 sm:py-28 px-5 sm:px-8 lg:px-12" style="background:#111144;">
+    
+    <div class="max-w-7xl mx-auto text-center">
+     <div class="fade-in-up"><span class="inline-block text-turuncu font-display font-bold text-sm tracking-[0.3em] uppercase mb-4">Veriler</span>
+      <h2 class="font-display font-bold text-white leading-tight" style="font-size:clamp(2rem,5vw,3.2rem);">Sayılarla <span class="text-turuncu">Sessiz Tanıklık</span></h2>
+     </div>
+     <div class="fade-in-up mt-12 sm:mt-16 grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
+      <div class="bg-white/5 border border-white/10 rounded-3xl p-8 sm:p-10 backdrop-blur-sm">
+       <p class="stat-number font-display font-bold text-turuncu" style="font-size:clamp(2.5rem,6vw,4rem);">%76</p>
+       <p class="font-body text-white/70 mt-3 leading-relaxed">Öğrencilerin <strong class="text-white">%76'i</strong> okulda zorbalığa tanık oluyor.</p>
+      </div>
+      <div class="bg-white/5 border border-white/10 rounded-3xl p-8 sm:p-10 backdrop-blur-sm">
+       <p class="stat-number font-display font-bold text-turuncu" style="font-size:clamp(2.5rem,6vw,4rem);">%57</p>
+       <p class="font-body text-white/70 mt-3 leading-relaxed">Tanıkların yalnızca bir kısmı <strong class="text-white">müdahale etmeye</strong> çalışıyor.</p>
+      </div>
+      <div class="bg-white/5 border border-white/10 rounded-3xl p-8 sm:p-10 backdrop-blur-sm">
+       <p class="stat-number font-display font-bold text-turuncu" style="font-size:clamp(2.5rem,6vw,4rem);">10sn</p>
+       <p class="font-body text-white/70 mt-3 leading-relaxed">Bir tanık müdahale ettiğinde zorbalık ortalama <strong class="text-white">10 saniyede</strong> durur.</p>
+      </div>
+     </div>
+     <div class="fade-in-up mt-10 max-w-2xl mx-auto">
+      <p class="text-white/50 font-body text-sm leading-relaxed">Veriler uluslararası akademik çalışmalar ve kurum raporlarından derlenmiştir. </p>
+      <div class="mt-16 max-w-4xl mx-auto text-left border-t border-white/10 pt-8">
+</div>
+     </div>
+    </div>
+   </section><!-- ===== HİKÂYELER ===== -->
+   <section id="hikayeler" class="relative w-full py-20 sm:py-28 px-5 sm:px-8 lg:px-12" style="background:#F4F1EC;">
+    <div class="max-w-7xl mx-auto">
+     <div class="fade-in-up text-center"><span class="inline-block text-turuncu font-display font-bold text-sm tracking-[0.3em] uppercase mb-4">Hikâyeler</span>
+      <h2 class="font-display font-bold text-lacivert leading-tight" style="font-size:clamp(2rem,5vw,3.2rem);">Bu Hikâyeyi <span class="text-turuncu">(</span>Sen<span class="text-turuncu">)</span> Değiştirebilirsin.</h2>
+      <p class="mt-4 text-lacivert/60 font-body max-w-xl mx-auto">Aşağıdaki senaryolar, öğrencilerin sıkça karşılaştığı durumlardan ilham alınarak kurgulanmıştır.</p>
+     </div>
+     <div class="fade-in-up mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="story-card bg-white rounded-3xl p-6 sm:p-8 border border-lacivert/5 relative overflow-hidden">
+       <div class="absolute top-0 right-0 w-20 h-20 bg-turuncu/5 rounded-bl-[3rem]"></div>
+       <div class="w-10 h-10 rounded-xl bg-turuncu/10 flex items-center justify-center mb-5"><i data-lucide="message-circle" style="width:20px;height:20px;color:#F98513;"></i>
+       </div>
+       <p class="font-body text-lacivert/80 leading-relaxed text-sm sm:text-base">"Sınıf grubunda sürekli aynı kişiye 'şaka' yapıyorlardı. Herkes gülüyor diye ben de gülüyordum. Sonra onun artık okula gelmek istemediğini öğrendim."</p>
+       <div class="mt-5 pt-4 border-t border-lacivert/5"><span class="text-turuncu font-display font-bold text-sm">Tanık, 15 yaş</span>
+       </div>
+      </div>
+      <div class="story-card bg-white rounded-3xl p-6 sm:p-8 border border-lacivert/5 relative overflow-hidden">
+       <div class="absolute top-0 right-0 w-20 h-20 bg-mavi/5 rounded-bl-[3rem]"></div>
+       <div class="w-10 h-10 rounded-xl bg-mavi/10 flex items-center justify-center mb-5"><i data-lucide="eye-off" style="width:20px;height:20px;color:#223382;"></i>
+       </div>
+       <p class="font-body text-lacivert/80 leading-relaxed text-sm sm:text-base">"Teneffüste bir çocuğun çantasını saklıyorlardı. Herkes biliyordu ama kimse bir şey demiyordu. Ben de demedim. Keşke deseydim."</p>
+       <div class="mt-5 pt-4 border-t border-lacivert/5"><span class="text-turuncu font-display font-bold text-sm">Tanık, 14 yaş</span>
+       </div>
+      </div>
+      <div class="story-card bg-white rounded-3xl p-6 sm:p-8 border border-lacivert/5 relative overflow-hidden">
+       <div class="absolute top-0 right-0 w-20 h-20 bg-turuncu/5 rounded-bl-[3rem]"></div>
+       <div class="w-10 h-10 rounded-xl bg-turuncu/10 flex items-center justify-center mb-5"><i data-lucide="shield-check" style="width:20px;height:20px;color:#F98513;"></i>
+       </div>
+       <p class="font-body text-lacivert/80 leading-relaxed text-sm sm:text-base">"Sınıfta bir kızı herkes dışlıyordu. Bir gün yanına oturdum, sadece o kadar. İki hafta sonra başkaları da oturdu. Bazen küçük şeyler yeter."</p>
+       <div class="mt-5 pt-4 border-t border-lacivert/5"><span class="text-turuncu font-display font-bold text-sm">Tanık, 16 yaş</span>
+       </div>
+      </div>
+     </div>
+    </div>
+   </section><!-- ===== FORUM ===== -->
+   <section id="forum" class="relative w-full py-20 sm:py-28 px-5 sm:px-8 lg:px-12" style="background:#111144;">
+    <div class="max-w-7xl mx-auto">
+     <div class="fade-in-up text-center"><span class="inline-block text-turuncu font-display font-bold text-sm tracking-[0.3em] uppercase mb-4">Forum</span>
+      <h2 class="font-display font-bold text-white leading-tight" style="font-size:clamp(2rem,5vw,3.2rem);">Sizin Hikâyeleriniz </h2>
+      <p class="mt-4 text-white/60 font-body max-w-2xl mx-auto">Zorbalığa uğradıysan, tanık olduysan ya da dur deyip müdahale ettiysen , başkalarının cesaret bulması için hikâyeni paylaş.</p>
+     </div>
+     <div class="fade-in-up mt-12 flex flex-wrap gap-2 justify-center mb-8"><button class="forum-story-tab active px-6 py-3 rounded-full font-body font-semibold text-sm transition-all" data-story-type="victim" style="background:#F98513;color:white;">Bana Yapıldı</button> <button class="forum-story-tab px-6 py-3 rounded-full font-body font-semibold text-sm transition-all border border-white/20 text-white hover:border-turuncu" data-story-type="witness">Tanık Oldum</button> <button class="forum-story-tab px-6 py-3 rounded-full font-body font-semibold text-sm transition-all border border-white/20 text-white hover:border-turuncu" data-story-type="intervene">Ben Müdahale Ettim</button>
+     </div>
+     <div class="fade-in-up grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div class="lg:col-span-2">
+       <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl p-6 sm:p-8">
+        <h3 class="font-display font-bold text-white text-xl mb-1" id="forumTitle">Bana Zorbalık Yapıldı</h3>
+        <p class="text-white/50 font-body text-sm mb-6">Hikâyeni paylaş. Sesini duyulsun. Anonim kalabilirsin.</p>
+        <form id="forumForm">
+         <div class="mb-6"><label for="storyType" class="block text-white font-body font-semibold mb-3 text-sm">Hikâye Türü <span class="text-turuncu">*</span></label> <select id="storyType" name="storyType" required class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white font-body placeholder-white/40 focus:outline-none focus:border-turuncu focus:ring-2 focus:ring-turuncu/30 transition-all"> <option value="victim" style="color:#111144;">Bana Yapıldı</option> <option value="witness" style="color:#111144;">Tanık Oldum</option> <option value="intervene" style="color:#111144;">Ben Müdahale Ettim</option> </select>
+         </div>
+         <div class="mb-6"><label for="storyContent" class="block text-white font-body font-semibold mb-3 text-sm">Senin Hikâyen <span class="text-turuncu">*</span></label> <textarea id="storyContent" name="storyContent" placeholder="Seni dinliyoruz. Neler yaşandı? Neler hissettin? Burası, kimliğinin korunduğu güvenli bir bildirim ve paylaşım alanıdır." required maxlength="1000" rows="6" class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white font-body placeholder-white/40 focus:outline-none focus:border-turuncu focus:ring-2 focus:ring-turuncu/30 transition-all resize-none"></textarea>
+          <p class="text-white/40 font-body text-xs mt-2"><span id="storyCharCount">0</span>/1000</p>
+         </div>
+         <div class="mb-8 flex items-start gap-3"><input type="checkbox" id="forumAnonymous" name="forumAnonymous" class="w-5 h-5 rounded cursor-pointer mt-1" style="accent-color:#F98513;appearance:auto;"> <label for="forumAnonymous" class="text-white font-body text-sm flex-1">Hikâyeyi anonim olarak yayınla (İsim verilmeyecek)</label>
+         </div><button type="submit" id="submitStoryBtn" class="w-full inline-flex items-center justify-center gap-2 bg-turuncu text-white px-6 py-4 rounded-full font-body font-bold text-base hover:bg-orange-600 transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"> <i data-lucide="send" style="width:18px;height:18px;"></i> <span id="submitStoryBtnText">Hikâyeyi Paylaş</span> </button>
+        </form>
+        <div id="storySuccess" class="hidden text-center mt-8">
+         <div class="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4"><i data-lucide="check-circle" style="width:32px;height:32px;color:#22c55e;"></i>
+         </div>
+         <h4 class="font-display font-bold text-white text-xl">Hikâyen Yayında</h4>
+         <p class="mt-3 text-white/60 font-body">Teşekkürler. Senin gibi pek çok kişi bu hikâyeyi okuyup cesaret bulacak.</p>
+        </div>
+       </div>
+      </div>
+      <div class="lg:col-span-1">
+       <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl p-6 sm:p-8 h-full flex flex-col">
+        <h3 class="font-display font-bold text-white text-lg mb-6">Hikâyeler</h3>
+        <div id="forumStoriesList" class="space-y-4 flex-1 overflow-y-auto max-h-96">
+         <div class="text-center py-8">
+          <p class="text-white/40 font-body text-sm">Henüz hikâye yok. İlk adımı sen at.</p>
+         </div>
+        </div>
+       </div>
+      </div>
+     </div>
+    </div>
+   </section><!-- ===== NE YAPABİLİRSİN ===== -->
+   <section id="ne-yapabilirsin" class="relative w-full py-20 sm:py-28 px-5 sm:px-8 lg:px-12" style="background:linear-gradient(180deg,#F4F1EC 0%,#edeae3 100%);">
+    <div class="max-w-7xl mx-auto">
+     <div class="fade-in-up text-center"><span class="inline-block text-turuncu font-display font-bold text-sm tracking-[0.3em] uppercase mb-4">Harekete Geç</span>
+      <h2 class="font-display font-bold text-lacivert leading-tight" style="font-size:clamp(2rem,5vw,3.2rem);">Tanık <span class="text-turuncu">olduysan ne yapabilirsin?</span></h2>
+     </div>
+     <div class="fade-in-up mt-12 sm:mt-16 grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="bg-white rounded-3xl p-6 sm:p-8 border border-lacivert/5 relative group hover:border-turuncu/30 transition-colors flex flex-col items-center text-center">
+       <div class="w-14 h-14 rounded-2xl bg-turuncu/10 flex items-center justify-center mb-5"><i data-lucide="eye" style="width:24px;height:24px;color:#F98513;"></i>
+       </div>
+       <h3 class="font-display font-bold text-lacivert text-lg mb-2">1. Durumu Fark Et</h3>
+       <p class="text-lacivert/70 font-body text-sm mb-4 flex-grow">Bunun şaka mı yoksa zorbalık mı olduğunu küçümsemeden değerlendir.</p>
+       <div class="pt-4 border-t border-lacivert/5 w-full">
+        <p class="text-turuncu font-body text-xs font-semibold">Neden önemli: Fark etmek, hareket etmenin ilk adımı.</p>
+       </div>
+      </div>
+      <div class="bg-white rounded-3xl p-6 sm:p-8 border border-lacivert/5 relative group hover:border-turuncu/30 transition-colors flex flex-col items-center text-center">
+       <div class="w-14 h-14 rounded-2xl bg-turuncu/10 flex items-center justify-center mb-5"><i data-lucide="user-plus" style="width:24px;height:24px;color:#F98513;"></i>
+       </div>
+       <h3 class="font-display font-bold text-lacivert text-lg mb-2">2. Yalnız Bırakma</h3>
+       <p class="text-lacivert/70 font-body text-sm mb-4 flex-grow">Mağdura "iyi misin?" de. Yanında dur. Fiziksel olarak orada olmak bile güçlü bir mesajdır.</p>
+       <div class="pt-4 border-t border-lacivert/5 w-full">
+        <p class="text-turuncu font-body text-xs font-semibold">Neden önemli: Birine değer verildiğini hissettirmek her şeyi değiştirir.</p>
+       </div>
+      </div>
+      <div class="bg-white rounded-3xl p-6 sm:p-8 border border-lacivert/5 relative group hover:border-turuncu/30 transition-colors flex flex-col items-center text-center">
+       <div class="w-14 h-14 rounded-2xl bg-turuncu/10 flex items-center justify-center mb-5"><i data-lucide="message-circle" style="width:24px;height:24px;color:#F98513;"></i>
+       </div>
+       <h3 class="font-display font-bold text-lacivert text-lg mb-2">3. Konuşma Değiştir</h3>
+       <p class="text-lacivert/70 font-body text-sm mb-4 flex-grow">Grubun dikkatini başka yöne çek. "Hadi gidelim" ya da "Bırakın artık" gibi kısa müdahaleler bile işe yarar.</p>
+       <div class="pt-4 border-t border-lacivert/5 w-full">
+        <p class="text-turuncu font-body text-xs font-semibold">Neden önemli: Grup dinamiğini kırabilirsen, zorbalık durur.</p>
+       </div>
+      </div>
+      <div class="bg-white rounded-3xl p-6 sm:p-8 border border-lacivert/5 relative group hover:border-turuncu/30 transition-colors flex flex-col items-center text-center">
+       <div class="w-14 h-14 rounded-2xl bg-turuncu/10 flex items-center justify-center mb-5"><i data-lucide="alert-circle" style="width:24px;height:24px;color:#F98513;"></i>
+       </div>
+       <h3 class="font-display font-bold text-lacivert text-lg mb-2">4. Bildir</h3>
+       <p class="text-lacivert/70 font-body text-sm mb-4 flex-grow">Güvendiğin bir yetişkine anlat. Öğretmen, rehber, aile... İsimsiz de bildirebilirsin.</p>
+       <div class="pt-4 border-t border-lacivert/5 w-full">
+        <p class="text-turuncu font-body text-xs font-semibold">Neden önemli: Sistemin harekete geçmesi gerekiyor.</p>
+       </div>
+      </div>
+     </div>
+     <div class="fade-in-up mt-12 text-center">
+      <div class="inline-flex items-center gap-3 px-6 py-4 rounded-2xl bg-turuncu/10 border border-turuncu/20"><i data-lucide="info" style="width:18px;height:18px;color:#F98513;"></i>
+       <p class="text-turuncu font-body font-semibold text-sm"><strong>Bildirmek ispiyonculuk değil,</strong> sistemi güncellemektir.</p>
+      </div>
+     </div>
+    </div>
+   </section><!-- ===== BİLDİR ===== -->
+   <section id="bildir" class="relative w-full py-20 sm:py-28 px-5 sm:px-8 lg:px-12" style="background:#223382;">
+    <div class="max-w-6xl mx-auto">
+     <div class="fade-in-up text-center mb-12 sm:mb-16"><span class="inline-block text-turuncu font-display font-bold text-sm tracking-[0.3em] uppercase mb-4">Güvenli Bildir</span>
+      <h2 class="font-display font-bold text-white leading-tight" style="font-size:clamp(2rem,5vw,3.2rem);">Söylemek <span class="text-turuncu">cesaret ister, </span><br> ama yalnız değilsin.</h2>
+      <p class="mt-5 text-white/60 font-body max-w-xl mx-auto leading-relaxed">Burada bilgi toplamak ya da yargılamak yok. Amacımız seni yönlendirmek. Eğer kendin ya da bir başkası için endişeleniyorsan, güvenli kanallarımızı kullanabilirsin.</p>
+     </div><!-- Tabs -->
+     <div class="fade-in-up flex flex-wrap gap-2 justify-center mb-10 sm:mb-12"><button class="report-channel-tab active px-5 py-2 rounded-full font-body font-semibold text-sm transition-all" data-channel="hotlines" style="background:#F98513;color:white;">Hızlı Hatlar</button> <button class="report-channel-tab px-5 py-2 rounded-full font-body font-semibold text-sm transition-all border border-white/20 text-white hover:border-turuncu" data-channel="form">Anında Bildir</button>
+     </div><!-- Hotlines Content -->
+     <div id="hotlines-content" class="report-channel-content fade-in-up grid grid-cols-1 sm:grid-cols-2 gap-5">
+      <div class="bg-white/10 border border-white/10 rounded-3xl p-6 sm:p-8 text-left backdrop-blur-sm hover:bg-white/15 transition-colors">
+       <div class="w-12 h-12 rounded-2xl bg-turuncu/20 flex items-center justify-center mb-4"><i data-lucide="phone" style="width:22px;height:22px;color:#F98513;"></i>
+       </div>
+       <h3 class="font-display font-bold text-white text-lg">ALO 182</h3>
+       <p class="mt-2 text-white/60 font-body text-sm leading-relaxed">Sosyal Destek Hattı. 7/24 ücretsiz arayabilirsin. İsim vermek zorunda değilsin.</p>
+      </div>
+      <div class="bg-white/10 border border-white/10 rounded-3xl p-6 sm:p-8 text-left backdrop-blur-sm hover:bg-white/15 transition-colors">
+       <div class="w-12 h-12 rounded-2xl bg-turuncu/20 flex items-center justify-center mb-4"><i data-lucide="message-square" style="width:22px;height:22px;color:#F98513;"></i>
+       </div>
+       <h3 class="font-display font-bold text-white text-lg">Okul Rehberliği</h3>
+       <p class="mt-2 text-white/60 font-body text-sm leading-relaxed">Rehber öğretmenine yüz yüze ya da mesajla ulaşabilirsin. Gizlilik senin hakkın.</p>
+      </div>
+      <div class="bg-white/10 border border-white/10 rounded-3xl p-6 sm:p-8 text-left backdrop-blur-sm hover:bg-white/15 transition-colors">
+       <div class="w-12 h-12 rounded-2xl bg-turuncu/20 flex items-center justify-center mb-4"><i data-lucide="users" style="width:22px;height:22px;color:#F98513;"></i>
+       </div>
+       <h3 class="font-display font-bold text-white text-lg">Güvendiğin Bir Yetişkin</h3>
+       <p class="mt-2 text-white/60 font-body text-sm leading-relaxed">Aile, abi, abla, antrenör, komşu... Seni dinleyecek birine anlat. Yalnız taşıma.</p>
+      </div>
+      <div class="bg-white/10 border border-white/10 rounded-3xl p-6 sm:p-8 text-left backdrop-blur-sm hover:bg-white/15 transition-colors">
+       <div class="w-12 h-12 rounded-2xl bg-turuncu/20 flex items-center justify-center mb-4"><i data-lucide="shield" style="width:22px;height:22px;color:#F98513;"></i>
+       </div>
+       <h3 class="font-display font-bold text-white text-lg">CİMER</h3>
+       <p class="mt-2 text-white/60 font-body text-sm leading-relaxed">Ciddi durumlarda resmi bildirimi bir yetişkinle birlikte yapabilirsin.</p>
+      </div>
+     </div><!-- Form Content -->
+     <div id="form-content" class="report-channel-content hidden fade-in-up">
+      <div class="bg-white/10 backdrop-blur-sm border border-white/10 rounded-3xl p-6 sm:p-10">
+       <h3 class="font-display font-bold text-white text-2xl mb-2">Anında Bildir</h3>
+       <p class="text-white/60 font-body text-sm mb-8">Zorbalığa tanık oldun mu? Hemen bunu buradan raporla. Bilgilerin tamamen gizli tutulur.</p>
+       <form id="reportForm"><!-- Zorbalık Türü -->
+        <div class="mb-6"><label for="bullyingType" class="block text-white font-body font-semibold mb-3 text-sm">Zorbalığın Türü <span class="text-turuncu">*</span></label> <select id="bullyingType" name="bullyingType" required class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white font-body placeholder-white/40 focus:outline-none focus:border-turuncu focus:ring-2 focus:ring-turuncu/30 transition-all"> <option value="" style="color:#111144;">— Bir tür seçin —</option> <option value="fiziksel" style="color:#111144;">Fiziksel Zorbalık</option> <option value="sosyal" style="color:#111144;">Sosyal Zorbalık</option> <option value="sozel" style="color:#111144;">Sözel Zorbalık</option> <option value="dijital" style="color:#111144;">Dijital Zorbalık</option> </select>
+        </div><!-- Nerede Oldu -->
+        <div class="mb-6"><label for="location" class="block text-white font-body font-semibold mb-3 text-sm">Nerede Oldu? <span class="text-turuncu">*</span></label> <select id="location" name="location" required class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white font-body placeholder-white/40 focus:outline-none focus:border-turuncu focus:ring-2 focus:ring-turuncu/30 transition-all"> <option value="" style="color:#111144;">— Yer seçin —</option> <option value="okul" style="color:#111144;">Okulda</option> <option value="teneffus" style="color:#111144;">Teneffüste</option> <option value="servis" style="color:#111144;">Serviste</option> <option value="sosyal-medya" style="color:#111144;">Sosyal Medyada</option> <option value="cevrimici" style="color:#111144;">Çevrimiçi (Oyun, Chat vb.)</option> <option value="diger" style="color:#111144;">Diğer</option> </select>
+        </div><!-- Açıklama -->
+        <div class="mb-6"><label for="description" class="block text-white font-body font-semibold mb-3 text-sm">Ne Oldu? (Kısa Açıklama) <span class="text-turuncu">*</span></label> <textarea id="description" name="description" placeholder="Zorbalığın ne olduğunu kısaca yazabilirsin..." required maxlength="500" rows="4" class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white font-body placeholder-white/40 focus:outline-none focus:border-turuncu focus:ring-2 focus:ring-turuncu/30 transition-all resize-none"></textarea>
+         <p class="text-white/40 font-body text-xs mt-2"><span id="charCount">0</span>/500</p>
+        </div>
+        <div class="grid gap-6 lg:grid-cols-2">
+         <div class="mb-6"><label for="incidentAddress" class="block text-white font-body font-semibold mb-3 text-sm">Adres / Konum</label> <input id="incidentAddress" name="incidentAddress" type="text" placeholder="Okul adı, bina, koridor vb." class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white font-body placeholder-white/40 focus:outline-none focus:border-turuncu focus:ring-2 focus:ring-turuncu/30 transition-all" /></div>
+         <div class="mb-6"><label for="contactNumber" class="block text-white font-body font-semibold mb-3 text-sm">İletişim Numarası</label> <input id="contactNumber" name="contactNumber" type="tel" placeholder="Opsiyonel: numara veya WhatsApp" class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white font-body placeholder-white/40 focus:outline-none focus:border-turuncu focus:ring-2 focus:ring-turuncu/30 transition-all" /></div>
+        </div>
+        <div class="mb-6"><label for="extraDetails" class="block text-white font-body font-semibold mb-3 text-sm">Ek Bilgi</label> <textarea id="extraDetails" name="extraDetails" placeholder="Varsa eklemek istediğin diğer detayları yazabilirsin..." maxlength="250" rows="3" class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white font-body placeholder-white/40 focus:outline-none focus:border-turuncu focus:ring-2 focus:ring-turuncu/30 transition-all resize-none"></textarea>
+         <p class="text-white/40 font-body text-xs mt-2"><span id="extraCharCount">0</span>/250</p>
+        </div><!-- Anonim Checkbox -->
+        <div class="mb-8"><label class="flex items-center gap-3 cursor-pointer"> <input type="checkbox" id="isAnonymous" name="isAnonymous" class="w-5 h-5 rounded cursor-pointer" style="accent-color:#F98513;appearance:auto;"> <span class="text-white font-body text-sm">Anonim olarak bildir (İsim verilmeyecek)</span> </label>
+        </div><!-- Submit Button --> <button type="submit" id="submitReportBtn" class="w-full inline-flex items-center justify-center gap-2 bg-turuncu text-white px-6 py-4 rounded-full font-body font-bold text-base hover:bg-orange-600 transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"> <i data-lucide="send" style="width:18px;height:18px;"></i> <span id="submitBtnText">Bildir</span> </button>
+       </form><!-- Success Message -->
+       <div id="reportSuccess" class="hidden text-center mt-8">
+        <div class="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4"><i data-lucide="check-circle" style="width:32px;height:32px;color:#22c55e;"></i>
+        </div>
+        <h4 class="font-display font-bold text-white text-xl">Raporun Alındı</h4>
+        <p class="mt-3 text-white/60 font-body">Teşekkürler. Tüm bilgilerin gizli tutulacak ve gerekli yetkililer bilgilendirilecek.</p>
+        <p class="mt-4 text-turuncu font-body font-semibold text-sm" id="successHashtag">#HikâyedeKalmasın</p>
+       </div>
+      </div>
+     </div>
+    </div>
+   </section><!-- ===== PLEDGE / SÖZ ===== -->
+   <section id="soz" class="relative w-full py-20 sm:py-28 px-5 sm:px-8 lg:px-12" style="background:#F4F1EC;">
+    <div class="max-w-4xl mx-auto text-center">
+     <div class="fade-in-up"><span class="inline-block text-turuncu font-display font-bold text-sm tracking-[0.3em] uppercase mb-4">Söz Ver</span>
+      <h2 class="font-display font-bold text-lacivert leading-tight" style="font-size:clamp(2rem,5vw,3.2rem);">Bu <span class="text-turuncu">(</span>parantezi<span class="text-turuncu">)</span> kapat.</h2>
+      <p class="mt-4 text-lacivert/60 font-body max-w-xl mx-auto">Büyük sözlere gerek yok. Küçük bir kararlılık yeter.</p>
+     </div>
+     <div class="fade-in-up mt-10">
+      <div id="pledgeCard" class="bg-white rounded-3xl p-8 sm:p-12 border border-lacivert/5 shadow-sm max-w-lg mx-auto">
+       <div id="pledgeContent">
+        <div class="w-16 h-16 rounded-full bg-turuncu/10 flex items-center justify-center mx-auto mb-6"><i data-lucide="heart-handshake" style="width:32px;height:32px;color:#F98513;"></i>
+        </div>
+        <p class="font-body text-lacivert/80 leading-relaxed">"Bundan sonra gördüğümde geçmeyeceğim. Fark edeceğim, yanında duracağım ya da güvendiğim birine söyleyeceğim."</p>
+        <form id="pledgeFormElement" class="mt-8 space-y-4">
+         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <label class="block text-left text-lacivert font-body text-sm">Ad<input id="pledgeFirstName" type="text" required class="mt-2 w-full rounded-2xl border border-lacivert/10 px-4 py-3 text-lacivert focus:border-turuncu focus:outline-none" placeholder="Adın" /></label>
+          <label class="block text-left text-lacivert font-body text-sm">Soyad<input id="pledgeLastName" type="text" required class="mt-2 w-full rounded-2xl border border-lacivert/10 px-4 py-3 text-lacivert focus:border-turuncu focus:outline-none" placeholder="Soyadın" /></label>
+         </div>
+         <button type="submit" class="w-full inline-flex items-center justify-center gap-2 bg-turuncu text-white px-8 py-3.5 rounded-full font-body font-semibold text-base hover:bg-orange-600 transition-all hover:scale-105"> <i data-lucide="check-circle" style="width:18px;height:18px;"></i> Hikâyede Kalmasın Kart Oluştur</button>
+         <p class="text-lacivert/60 text-sm">Ad soyad bilgisi sadece ekranda gösterilir. Gizlilik Esastır</p>
+        </form>
+       </div>
+       <div id="pledgeDone" class="hidden">
+        <div class="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6"><i data-lucide="check" style="width:32px;height:32px;color:#22c55e;"></i>
+        </div>
+        <p class="font-display font-bold text-lacivert text-2xl">Hikâyede Kalmasın Kartın Hazır</p>
+        <p class="mt-3 font-body text-lacivert/60">Bu kart şimdi ekranda. Dilersen ekran görüntüsü alabilirsin.</p>
+        <div class="mt-6 rounded-3xl border border-turuncu/20 bg-turuncu/10 p-6 text-left">
+         <p class="text-turuncu font-display font-bold text-sm uppercase tracking-[0.2em] mb-2">Hikâyede Kalmasın Kart</p>
+         <div class="rounded-3xl bg-white p-6 shadow-sm">
+          <p class="text-lacivert/60 text-sm">Ad Soyad</p>
+          <p class="mt-1 font-display font-bold text-lacivert text-2xl" id="pledgeCardName"></p>
+          <p class="mt-4 text-lacivert/70 text-sm">Bu kart, hikâyede kalmamaya verdiğin sözün simgesidir.</p>
+         </div>
+        </div>
+        <p class="mt-4 font-display font-bold text-turuncu text-lg" id="pledgeHashtag">#HikâyedeKalmasın</p>
+       </div>
+      </div>
+     </div>
+    </div>
+   </section><!-- ===== FINAL CTA ===== -->
+   <section id="final-cta" class="relative w-full py-24 sm:py-36 px-5 sm:px-8 lg:px-12 overflow-hidden" style="background:linear-gradient(160deg,#111144 0%,#1a1a5c 30%,#223382 100%);">
+    <div class="absolute inset-0 pointer-events-none overflow-hidden"><span class="absolute text-white/[0.08] font-display" style="font-size:clamp(150px,25vw,500px);top:-10%;left:-5%;line-height:1;animation:float1 12s ease-in-out infinite;">(</span> <span class="absolute text-turuncu/[0.08] font-display" style="font-size:clamp(150px,25vw,500px);bottom:-15%;right:-5%;line-height:1;animation:float2 14s ease-in-out infinite;">)</span>
+     <div class="absolute inset-0" style="background-image:radial-gradient(circle at 20% 50%, rgba(249,133,19,0.05) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(34,51,130,0.05) 0%, transparent 50%);"></div>
+    </div>
+    <div class="relative z-10 max-w-6xl mx-auto text-center">
+     <div class="fade-in-up">
+      <h2 class="font-display font-bold text-white leading-tight" style="font-size:clamp(2.5rem,8vw,4.5rem);" id="finalCtaTitle">Bir şey gördüğünde,<br><span class="text-turuncu">hikâyede kalmasın.</span></h2>
+     </div>
+     <div class="fade-in-up mt-6 sm:mt-8">
+      <p class="font-body text-white/70 leading-relaxed max-w-2xl mx-auto" style="font-size:clamp(0.95rem,1.8vw,1.2rem);" id="finalCtaSubtitle">Bazen bir döngüyü kırmak için sadece bir kişinin durması gerekir. O kişi sen olabilirsin.</p>
+     </div>
+     <div class="fade-in-up mt-12 sm:mt-14 flex flex-col sm:flex-row gap-4 w-full sm:w-auto justify-center">
+      <a href="#bildir" class="inline-flex items-center justify-center gap-2 bg-turuncu text-white px-8 py-4 rounded-full font-body font-bold text-base sm:text-lg hover:bg-orange-600 transition-all hover:scale-105 shadow-lg hover:shadow-xl"> <i data-lucide="alert-circle" style="width:20px;height:20px;"></i> Şimdi Bildir </a> <a href="#ne-yapabilirsin" class="inline-flex items-center justify-center gap-2 bg-white/10 text-white border-2 border-white/30 px-8 py-4 rounded-full font-body font-bold text-base sm:text-lg hover:bg-white/20 transition-all hover:border-turuncu backdrop-blur-sm"> <i data-lucide="lightbulb" style="width:20px;height:20px;"></i> Ne Yapabilirim? </a>
+     </div>
+     <div class="fade-in-up mt-10 sm:mt-12 pt-10 sm:pt-12 border-t border-white/10">
+      <p class="font-display font-bold text-turuncu text-xl sm:text-3xl tracking-widest" id="finalHashtag">#HikâyedeKalmasın</p>
+      <p class="mt-3 text-white/50 font-body text-sm max-w-xl mx-auto">Bu hashtagı kullanarak, bu mesajın sesini yükseltebilirsin.</p>
+     </div>
+    </div>
+   </section><!-- ===== FOOTER ===== -->
+   <footer class="w-full py-12 sm:py-16 px-5 sm:px-8 lg:px-12" style="background:#111144;">
+    <div class="max-w-7xl mx-auto">
+     <div class="flex flex-col sm:flex-row items-center justify-between gap-6">
+      <div class="text-center sm:text-left"><span class="font-display text-2xl font-bold text-white">PARANTEZ</span>
+       <p class="mt-2 text-white/40 font-body text-sm">Hikâyede Kalmasın — Akran Zorbalığına Karşı Farkındalık Kampanyası</p>
+      </div>
+      <div class="flex items-center gap-4"><span class="text-turuncu font-display font-bold text-lg" id="footerHashtag">#HikâyedeKalmasın</span>
+      </div>
+       <h3 class="font-display font-bold text-white text-xl mb-4">
+    Kaynakça
+  </h3>
+
+  <ul class="text-white/70 font-body text-sm leading-relaxed space-y-2">
+    
+    <li>Hawkins, D. L., Pepler, D. J., & Craig, W. M. (2001). <em>Naturalistic Observations of Peer Interventions in Bullying.</em></li>
+    
+    <li>UNESCO (2019). <em>Behind the Numbers: Ending School Violence and Bullying.</em></li>
+    
+    <li>U.S. Department of Health & Human Services. <em>StopBullying.gov.</em></li>
+    
+    <li>Salmivalli, C. (1996); Pozzoli & Gini (2010); Obermann (2011).</li>
+
+  </ul>
+     </div>
+     <div class="mt-8 pt-8 border-t border-white/10 text-center">
+      <p class="text-white/30 font-body text-xs">Bu site bir sosyal farkındalık kampanyasıdır. Hiçbir kişisel veri toplanmamaktadır.</p>
+     </div>
+    </div>
+   </footer>
+  </div>
+  <script>
+const defaultConfig = {
+  hero_title: 'HİKÂYEDE KALMASIN',
+  hero_subtitle: 'Bu hikâyedeki (parantez) sensin.',
+  hashtag: '#HikâyedeKalmasın',
+  problem_main_title: 'İzleyip geçilen şey gerçekten geçip gitmiyor.',
+  why_slogan_title: '"Hikâyede Kalmasın" neden bu kadar önemli?',
+  final_cta_title: 'Bir şey gördüğünde, hikâyede kalmasın.',
+  final_cta_subtitle: 'Bazen bir döngüyü kırmak için sadece bir kişinin durması gerekir.',
+  background_color: '#111144',
+  surface_color: '#F4F1EC',
+  text_color: '#111144',
+  primary_action_color: '#F98513',
+  secondary_action_color: '#223382',
+  font_family: 'Oswald',
+  font_size: 16
+};
+
+let config = { ...defaultConfig };
+
+// Data SDK Handler
+const dataHandler = {
+  onDataChanged(data) {
+    console.log('Data updated:', data);
+    
+    // Render forum stories
+    const forumStories = data.filter(item => item.forumStoryText);
+    renderForumStories(forumStories);
+  }
+};
+
+function renderForumStories(stories) {
+  const listEl = document.getElementById('forumStoriesList');
+  
+  if (stories.length === 0) {
+    listEl.innerHTML = '<div class="text-center py-8"><p class="text-white/40 font-body text-sm">Henüz hikâye yok. İlk adımı sen at.</p></div>';
+    return;
+  }
+  
+  const storyTypeLabelMap = {
+    victim: '🔴 Bana Yapıldı',
+    witness: '👁️ Tanık Oldum',
+    intervene: '✋ Ben Müdahale Ettim'
+  };
+  
+  const existingStories = new Map(
+    [...listEl.children].map(el => [el.dataset.storyId, el])
+  );
+  
+  stories.forEach(story => {
+    if (existingStories.has(story.id)) {
+      existingStories.delete(story.id);
+    } else {
+      const storyEl = document.createElement('div');
+      storyEl.dataset.storyId = story.id;
+      storyEl.className = 'bg-white/5 rounded-2xl p-4 border border-white/5 hover:border-white/10 transition-colors';
+      storyEl.innerHTML = `
+        <div class="flex items-start gap-2 mb-2">
+          <span class="text-xs font-body text-turuncu font-semibold">${storyTypeLabelMap[story.forumStoryType] || '📖'}</span>
+        </div>
+        <p class="text-white/80 font-body text-xs leading-relaxed line-clamp-3">${story.forumStoryText}</p>
+        <p class="text-white/30 font-body text-xs mt-2">${story.isAnonymous ? 'Anonim' : 'Paylaşıldı'}</p>
+      `;
+      listEl.appendChild(storyEl);
+    }
+  });
+  
+  existingStories.forEach(el => el.remove());
+}
+
+// Initialize Data SDK
+window.dataSdk = window.dataSdk || {
+  init: () => {},
+  create: async () => ({ isOk: true })
+};
+if (typeof window.dataSdk.init === 'function') {
+  window.dataSdk.init(dataHandler);
+}
+
+function applyConfig(currentConfig) {
+  const c = { ...defaultConfig, ...currentConfig };
+
+  const heroTitleEl = document.getElementById('heroTitle');
+  if (heroTitleEl) {
+    const parts = c.hero_title.split(' ');
+    if (parts.length > 1) {
+      heroTitleEl.innerHTML = parts.slice(0, -1).join(' ') + '<br><span class="text-turuncu">' + parts[parts.length - 1] + '</span>';
+    } else {
+      heroTitleEl.innerHTML = '<span class="text-turuncu">' + c.hero_title + '</span>';
+    }
+  }
+
+  const heroSubEl = document.getElementById('heroSubtitle');
+  if (heroSubEl) {
+    heroSubEl.innerHTML = c.hero_subtitle.replace('(', '<span class="text-turuncu font-bold">(</span>').replace(')', '<span class="text-turuncu font-bold">)</span>');
+  }
+
+  const problemTitleEl = document.getElementById('problemMainTitle');
+  if (problemTitleEl && c.problem_main_title) {
+    problemTitleEl.textContent = c.problem_main_title;
+  }
+
+  const whySloganTitleEl = document.getElementById('whySloganTitle');
+  if (whySloganTitleEl && c.why_slogan_title) {
+    whySloganTitleEl.textContent = c.why_slogan_title;
+  }
+
+  const finalCtaTitleEl = document.getElementById('finalCtaTitle');
+  if (finalCtaTitleEl && c.final_cta_title) {
+    const parts = c.final_cta_title.split(/,(?!\s)/);
+    if (parts.length > 1) {
+      finalCtaTitleEl.innerHTML = parts[0].trim() + ',<br><span class="text-turuncu">' + parts[1].trim() + '</span>';
+    } else {
+      finalCtaTitleEl.innerHTML = '<span class="text-turuncu">' + c.final_cta_title + '</span>';
+    }
+  }
+
+  const finalCtaSubEl = document.getElementById('finalCtaSubtitle');
+  if (finalCtaSubEl && c.final_cta_subtitle) {
+    finalCtaSubEl.textContent = c.final_cta_subtitle;
+  }
+
+  document.querySelectorAll('#hashtagDisplay, #pledgeHashtag, #footerHashtag, #finalHashtag').forEach(el => {
+    if (el) el.textContent = c.hashtag;
+  });
+
+  const displayFont = c.font_family + ', sans-serif';
+  document.querySelectorAll('.font-display').forEach(el => { el.style.fontFamily = displayFont; });
+}
+
+if (window.elementSdk && typeof window.elementSdk.init === 'function') {
+  window.elementSdk.init({
+    defaultConfig,
+    onConfigChange: async (currentConfig) => {
+      config = currentConfig;
+      applyConfig(config);
+    },
+    mapToCapabilities: (currentConfig) => ({
+      recolorables: [
+        {
+          get: () => currentConfig.background_color || defaultConfig.background_color,
+          set: (v) => {
+            currentConfig.background_color = v;
+            window.elementSdk.setConfig({ background_color: v });
+          }
+        },
+        {
+          get: () => currentConfig.surface_color || defaultConfig.surface_color,
+          set: (v) => {
+            currentConfig.surface_color = v;
+            window.elementSdk.setConfig({ surface_color: v });
+          }
+        },
+        {
+          get: () => currentConfig.text_color || defaultConfig.text_color,
+          set: (v) => {
+            currentConfig.text_color = v;
+            window.elementSdk.setConfig({ text_color: v });
+          }
+        },
+        {
+          get: () => currentConfig.primary_action_color || defaultConfig.primary_action_color,
+          set: (v) => {
+            currentConfig.primary_action_color = v;
+            window.elementSdk.setConfig({ primary_action_color: v });
+          }
+        },
+        {
+          get: () => currentConfig.secondary_action_color || defaultConfig.secondary_action_color,
+          set: (v) => {
+            currentConfig.secondary_action_color = v;
+            window.elementSdk.setConfig({ secondary_action_color: v });
+          }
+        },
+      ],
+      borderables: [],
+      fontEditable: {
+        get: () => currentConfig.font_family || defaultConfig.font_family,
+        set: (v) => {
+          currentConfig.font_family = v;
+          window.elementSdk.setConfig({ font_family: v });
+        }
+      },
+      fontSizeable: {
+        get: () => currentConfig.font_size || defaultConfig.font_size,
+        set: (v) => {
+          currentConfig.font_size = v;
+          window.elementSdk.setConfig({ font_size: v });
+        }
+      }
+    }),
+    mapToEditPanelValues: (currentConfig) => new Map([
+      ['hero_title', currentConfig.hero_title || defaultConfig.hero_title],
+      ['hero_subtitle', currentConfig.hero_subtitle || defaultConfig.hero_subtitle],
+      ['hashtag', currentConfig.hashtag || defaultConfig.hashtag],
+      ['problem_main_title', currentConfig.problem_main_title || defaultConfig.problem_main_title],
+      ['why_slogan_title', currentConfig.why_slogan_title || defaultConfig.why_slogan_title],
+      ['final_cta_title', currentConfig.final_cta_title || defaultConfig.final_cta_title],
+      ['final_cta_subtitle', currentConfig.final_cta_subtitle || defaultConfig.final_cta_subtitle],
+    ])
+  });
+} else {
+  applyConfig(defaultConfig);
+}
+
+// Mobile menu management
+const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+const mobileMenu = document.getElementById('mobileMenu');
+const mobileMenuClose = document.getElementById('mobileMenuClose');
+const mobileOverlay = document.getElementById('mobileOverlay');
+const wrapper = document.getElementById('appWrapper');
+
+mobileMenuBtn.addEventListener('click', () => {
+  mobileMenu.classList.add('open');
+  mobileOverlay.style.opacity = '1';
+  mobileOverlay.style.pointerEvents = 'auto';
+});
+
+mobileMenuClose.addEventListener('click', () => {
+  mobileMenu.classList.remove('open');
+  mobileOverlay.style.opacity = '0';
+  mobileOverlay.style.pointerEvents = 'none';
+});
+
+mobileOverlay.addEventListener('click', () => {
+  mobileMenu.classList.remove('open');
+  mobileOverlay.style.opacity = '0';
+  mobileOverlay.style.pointerEvents = 'none';
+});
+
+document.querySelectorAll('.mobile-nav-link').forEach(link => {
+  link.addEventListener('click', () => {
+    mobileMenu.classList.remove('open');
+    mobileOverlay.style.opacity = '0';
+    mobileOverlay.style.pointerEvents = 'none';
+  });
+});
+
+// Scroll spy for navigation
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.nav-link');
+
+wrapper.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(section => {
+    const rect = section.getBoundingClientRect();
+    if (rect.top <= 150) {
+      current = section.getAttribute('id');
+    }
+  });
+  navLinks.forEach(link => {
+    link.classList.remove('active');
+    if (link.getAttribute('href') === '#' + current && current) {
+      link.classList.add('active');
+    }
+  });
+});
+
+// Fade-in-up animations with Intersection Observer
+const fadeElements = document.querySelectorAll('.fade-in-up');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1 });
+
+fadeElements.forEach(el => {
+  observer.observe(el);
+});
+
+// Bullying type tabs with card buttons
+document.querySelectorAll('.bullying-tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tabIndex = parseInt(btn.getAttribute('data-tab'), 10);
+    
+    // Remove active state from all buttons
+    document.querySelectorAll('.bullying-tab-btn').forEach(b => {
+      b.style.background = '';
+      b.style.borderColor = '';
+      b.style.color = '';
+      b.classList.remove('active');
+      b.classList.add('border', 'border-lacivert/20', 'text-lacivert');
+    });
+    
+    // Set active button
+    btn.style.background = '#F98513';
+    btn.style.color = 'white';
+    btn.style.borderColor = '#F98513';
+    btn.classList.add('active');
+    btn.classList.remove('border-lacivert/20', 'text-lacivert');
+    
+    const contents = document.querySelectorAll('.bullying-tab-content');
+    contents.forEach((content, index) => {
+      content.classList.add('hidden');
+      content.classList.remove('active');
+      if (index === tabIndex) {
+        content.classList.remove('hidden');
+        requestAnimationFrame(() => {
+          content.classList.add('active');
+        });
+      }
+    });
+  });
+});
+
+// Report channel tabs
+document.querySelectorAll('.report-channel-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const channel = btn.getAttribute('data-channel');
+    
+    document.querySelectorAll('.report-channel-tab').forEach(b => {
+      b.style.background = '';
+      b.style.color = '';
+      b.classList.remove('active');
+      b.classList.add('border', 'border-white/20', 'text-white', 'hover:border-turuncu');
+    });
+    
+    btn.style.background = '#F98513';
+    btn.style.color = 'white';
+    btn.classList.add('active');
+    btn.classList.remove('border', 'border-white/20', 'text-white', 'hover:border-turuncu');
+    
+    document.querySelectorAll('.report-channel-content').forEach(content => {
+      content.classList.add('hidden');
+    });
+    
+    const contentEl = document.getElementById(channel + '-content');
+    if (contentEl) {
+      contentEl.classList.remove('hidden');
+    }
+  });
+});
+
+// Character counter for textarea
+const descriptionEl = document.getElementById('description');
+const charCountEl = document.getElementById('charCount');
+const extraDetailsEl = document.getElementById('extraDetails');
+const extraCharCountEl = document.getElementById('extraCharCount');
+
+descriptionEl.addEventListener('input', () => {
+  charCountEl.textContent = descriptionEl.value.length;
+});
+
+extraDetailsEl.addEventListener('input', () => {
+  extraCharCountEl.textContent = extraDetailsEl.value.length;
+});
+
+// Report form submission
+const reportForm = document.getElementById('reportForm');
+const submitBtn = document.getElementById('submitReportBtn');
+const reportContent = reportForm.parentElement;
+const successEl = document.getElementById('reportSuccess');
+
+reportForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  
+  const bullyingType = document.getElementById('bullyingType').value;
+  const location = document.getElementById('location').value;
+  const description = document.getElementById('description').value;
+  const incidentAddress = document.getElementById('incidentAddress').value;
+  const contactNumber = document.getElementById('contactNumber').value;
+  const extraDetails = document.getElementById('extraDetails').value;
+  const isAnonymous = document.getElementById('isAnonymous').checked;
+  
+  submitBtn.disabled = true;
+  document.getElementById('submitBtnText').textContent = 'Gönderiliyor...';
+  
+  const reportData = {
+    id: 'report-' + Date.now(),
+    bullyingType,
+    location,
+    description,
+    incidentAddress,
+    contactNumber,
+    extraDetails,
+    isAnonymous,
+    createdAt: new Date().toISOString()
+  };
+  
+  try {
+    const result = await window.dataSdk.create(reportData);
+   await fetch("https://formspree.io/f/mkopdaze", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "Accept": "application/json"
+  },
+  body: JSON.stringify({
+    subject: "Yeni Bildirim Geldi 🚨",
+    bullyingType,
+    location,
+    description,
+    incidentAddress,
+    contactNumber,
+    extraDetails,
+    isAnonymous: isAnonymous ? "Evet" : "Hayır"
+  })
+});
+    
+    if (result.isOk) {
+      reportForm.classList.add('hidden');
+      successEl.classList.remove('hidden');
+      lucide.createIcons();
+    } else {
+      alert('Hata: Rapor gönderilemedi. Lütfen tekrar deneyin.');
+      submitBtn.disabled = false;
+      document.getElementById('submitBtnText').textContent = 'Bildir';
+    }
+  } catch (err) {
+    console.error('Report submission error:', err);
+    alert('Bir hata oluştu. Lütfen tekrar deneyin.');
+    submitBtn.disabled = false;
+    document.getElementById('submitBtnText').textContent = 'Bildir';
+  }
+});
+const pledgeFormElement = document.getElementById('pledgeFormElement');
+const pledgeContent = document.getElementById('pledgeContent');
+const pledgeDone = document.getElementById('pledgeDone');
+const pledgeCardName = document.getElementById('pledgeCardName');
+
+pledgeFormElement.addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  const firstName = document.getElementById('pledgeFirstName').value.trim();
+  const lastName = document.getElementById('pledgeLastName').value.trim();
+
+  if (!firstName || !lastName) {
+    alert('Lütfen ad ve soyadınızı girin.');
+    return;
+  }
+
+  pledgeCardName.textContent = `${firstName} ${lastName}`;
+  pledgeContent.classList.add('hidden');
+  pledgeDone.classList.remove('hidden');
+  lucide.createIcons();
+});
+
+// Smooth scroll for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', function (e) {
+    const href = this.getAttribute('href');
+    if (href && href !== '#') {
+      e.preventDefault();
+      const target = document.querySelector(href);
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  });
+});
+
+// Initialize Lucide icons
+lucide.createIcons();
+
+// Forum tabs
+document.querySelectorAll('.forum-story-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const storyType = btn.getAttribute('data-story-type');
+    
+    document.querySelectorAll('.forum-story-tab').forEach(b => {
+      b.style.background = '';
+      b.style.color = '';
+      b.classList.remove('active');
+      b.classList.add('border', 'border-white/20', 'text-white', 'hover:border-turuncu');
+    });
+    
+    btn.style.background = '#F98513';
+    btn.style.color = 'white';
+    btn.classList.add('active');
+    btn.classList.remove('border', 'border-white/20', 'text-white', 'hover:border-turuncu');
+    
+    document.getElementById('storyType').value = storyType;
+    
+    const titleMap = {
+      victim: 'Bana Zorbalık Yapıldı',
+      witness: 'Tanık Oldum',
+      intervene: 'Ben Müdahale Ettim'
+    };
+    document.getElementById('forumTitle').textContent = titleMap[storyType];
+  });
+});
+
+// Character counter for story textarea
+const storyContentEl = document.getElementById('storyContent');
+const storyCharCountEl = document.getElementById('storyCharCount');
+
+storyContentEl.addEventListener('input', () => {
+  storyCharCountEl.textContent = storyContentEl.value.length;
+});
+
+// Forum form submission
+const FORUM_FORM_ENDPOINT = "https://formspree.io/f/mqegroyq";
+
+const forumForm = document.getElementById('forumForm');
+const submitStoryBtn = document.getElementById('submitStoryBtn');
+const storySuccessEl = document.getElementById('storySuccess');
+
+forumForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const storyType = document.getElementById('storyType').value;
+  const storyContent = document.getElementById('storyContent').value;
+  const forumAnonymous = document.getElementById('forumAnonymous').checked;
+
+  submitStoryBtn.disabled = true;
+  document.getElementById('submitStoryBtnText').textContent = 'Gönderiliyor...';
+
+  const titleMap = {
+    victim: 'Bana Zorbalık Yapıldı',
+    witness: 'Tanık Oldum',
+    intervene: 'Ben Müdahale Ettim'
+  };
+
+  try {
+    const response = await fetch(FORUM_FORM_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        subject: 'Parantez - Yeni Forum Metni Onay Bekliyor',
+        formType: 'Forum Formu',
+        storyType,
+        storyTypeLabel: titleMap[storyType] || storyType,
+        storyContent,
+        isAnonymous: forumAnonymous ? 'Evet' : 'Hayır',
+        createdAt: new Date().toLocaleString('tr-TR')
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error('Mail gönderimi başarısız oldu.');
+    }
+
+    forumForm.classList.add('hidden');
+    storySuccessEl.classList.remove('hidden');
+    storySuccessEl.innerHTML = `
+      <div class="text-center">
+        <div class="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
+          <i data-lucide="check-circle" style="width:32px;height:32px;color:#16a34a;"></i>
+        </div>
+        <h4 class="font-display font-bold text-white text-xl">Hikâyen Bize Ulaştı</h4>
+        <p class="mt-3 text-white/60 font-body">
+          İçerik kontrolünden sonra uygun bulunursa anonim olarak paylaşılacaktır.
+        </p>
+      </div>
+    `;
+    lucide.createIcons();
+
+  } catch (err) {
+    console.error('Story submission error:', err);
+    alert('Bir hata oluştu. Lütfen tekrar deneyin.');
+    submitStoryBtn.disabled = false;
+    document.getElementById('submitStoryBtnText').textContent = 'Hikâyeyi Paylaş';
+  }
+});
+   
+  </script>
+  <script>
+    if (window.lucide && typeof lucide.createIcons === 'function') {
+      lucide.createIcons();
+    }
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9eac7e91228323a8',t:'MTc3NTkzNjc1NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
