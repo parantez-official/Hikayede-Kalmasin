@@ -7,10 +7,24 @@
   <title>PARANTEZ — Hikâyede Kalmasın</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   <script src="/_sdk/element_sdk.js"></script>
   <script src="/_sdk/data_sdk.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&amp;family=DM+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
   <script>
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const pledgeCountRef = firebase.database().ref('pledgeCount');
+
     tailwind.config = {
       theme: {
         extend: {
@@ -422,7 +436,7 @@ Doğru bir müdahale ve tek bir parantezle, kötü bir anıdan güçlü bir daya
          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
           <div class="p-4 bg-lacivert/5 rounded-2xl">
            <p class="text-turuncu font-display font-bold text-sm mb-2">İtilme, çarpma</p>
-           <p class="text-lacivert/70 font-body text-sm">Birine kasten çarpmak, itip düşürtmek</p>
+           <p class="text-lacivert/70 font-body text-sm">Birine kasten çarpmak, itip düşürmek</p>
           </div>
           <div class="p-4 bg-lacivert/5 rounded-2xl">
            <p class="text-turuncu font-display font-bold text-sm mb-2">Eşyaya zarar verme</p>
@@ -461,19 +475,19 @@ Doğru bir müdahale ve tek bir parantezle, kötü bir anıdan güçlü bir daya
           </div>
           <div class="p-4 bg-lacivert/5 rounded-2xl">
            <p class="text-turuncu font-display font-bold text-sm mb-2">Dedikodu</p>
-           <p class="text-lacivert/70 font-body text-sm">Hakkında yalan söylenti yaymak, iftira</p>
+           <p class="text-lacivert/70 font-body text-sm">Hakkında asılsız anlatılar kurgulamak</p>
           </div>
           <div class="p-4 bg-lacivert/5 rounded-2xl">
            <p class="text-turuncu font-display font-bold text-sm mb-2">Manipülasyon</p>
-           <p class="text-lacivert/70 font-body text-sm">Arkadaşlarını karşısına döndürmek</p>
+           <p class="text-lacivert/70 font-body text-sm">Sosyal çevreyi kasten yanlış yönlendirmek</p>
           </div>
           <div class="p-4 bg-lacivert/5 rounded-2xl">
            <p class="text-turuncu font-display font-bold text-sm mb-2">Görmezden gelme</p>
-           <p class="text-lacivert/70 font-body text-sm">Sesini duymamak, sohbetleri kesme</p>
+           <p class="text-lacivert/70 font-body text-sm">Kişinin varlığını kasıtlı olarak yok saymak, iletişim kanallarını kapatmak</p>
           </div>
          </div>
          <div class="p-5 rounded-2xl bg-turuncu/8 border-l-4 border-turuncu">
-          <p class="text-lacivert font-body text-sm"><strong>Dikkat:</strong> Sosyal zorbalık en tehlikelisi olabilir çünkü kişi yalnız hissetmeye başlar. Birinin aniden gruptan dışlanması, hakkında söylenti yayılması — bunlar küçük şeyler değil, çok ağır travmalar.</p>
+          <p class="text-lacivert font-body text-sm"><strong>Dikkat:</strong> Sosyal zorbalık, fiziksel müdahale gerektirmediği için genellikle fark edilmesi en zor olan şiddet türüdür. Birinin asılsız söylemlerle hedef gösterilmesi veya arkadaş ortamından sistemli olarak uzaklaştırılması, sadece o anı değil, kurulan güven bağlarını da zedeler. Bu sessiz döngüyü fark etmek, olayın sadece bir "hikâye" olarak kalmamasını ve gerçek bir dayanışmaya dönüşmesini sağlar.</p>
          </div>
         </div>
        </div>
@@ -488,7 +502,7 @@ Doğru bir müdahale ve tek bir parantezle, kötü bir anıdan güçlü bir daya
         </div>
         <div class="flex-1">
          <h3 class="font-display font-bold text-lacivert text-3xl mb-4">Sözel Zorbalık</h3>
-         <p class="text-lacivert/80 font-body leading-relaxed mb-6">Kelimelerle yapılan zarar. Bazı şeyler iyileşmez, söz izini kalır. En basit sözler bile, yıllar sonra hatırlanır ve kalp üzerinde ağır baskı bırakır.</p>
+         <p class="text-lacivert/80 font-body leading-relaxed mb-6">Kelimelerle yapılan zarar. Bazı şeyler iyileşmez, sözün izi kalır. En basit sözler bile, yıllar sonra hatırlanır ve kalp üzerinde ağır baskı bırakır.</p>
          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
           <div class="p-4 bg-lacivert/5 rounded-2xl">
            <p class="text-turuncu font-display font-bold text-sm mb-2">Lakap takma</p>
@@ -496,7 +510,7 @@ Doğru bir müdahale ve tek bir parantezle, kötü bir anıdan güçlü bir daya
           </div>
           <div class="p-4 bg-lacivert/5 rounded-2xl">
            <p class="text-turuncu font-display font-bold text-sm mb-2">Alay</p>
-           <p class="text-lacivert/70 font-body text-sm">Giydiğini, konuşuşunu, davranışını alay konusu yapmak</p>
+           <p class="text-lacivert/70 font-body text-sm">Giydiğini, konuşmasını, davranışını alay konusu yapmak</p>
           </div>
           <div class="p-4 bg-lacivert/5 rounded-2xl">
            <p class="text-turuncu font-display font-bold text-sm mb-2">Aşağılama</p>
@@ -527,7 +541,7 @@ Doğru bir müdahale ve tek bir parantezle, kötü bir anıdan güçlü bir daya
          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
           <div class="p-4 bg-lacivert/5 rounded-2xl">
            <p class="text-turuncu font-display font-bold text-sm mb-2">Dedikodu yayma</p>
-           <p class="text-lacivert/70 font-body text-sm">Yalan söylenti WhatsApp, TikTok, Instagram'da yayma</p>
+           <p class="text-lacivert/70 font-body text-sm"> Sosyal medya platformları üzerinden asılsız bilgi kurgulamak ve yaymak.</p>
           </div>
           <div class="p-4 bg-lacivert/5 rounded-2xl">
            <p class="text-turuncu font-display font-bold text-sm mb-2">İzinsiz paylaşım</p>
@@ -775,7 +789,7 @@ Doğru bir müdahale ve tek bir parantezle, kötü bir anıdan güçlü bir daya
    <section id="soz" class="relative w-full py-20 sm:py-28 px-5 sm:px-8 lg:px-12" style="background:#F4F1EC;">
     <div class="max-w-4xl mx-auto text-center">
      <div class="fade-in-up"><span class="inline-block text-turuncu font-display font-bold text-sm tracking-[0.3em] uppercase mb-4">Söz Ver</span>
-      <h2 class="font-display font-bold text-lacivert leading-tight" style="font-size:clamp(2rem,5vw,3.2rem);">Bu <strong class="text-turuncu"> parantezi </strong> kapat.<h2>
+      <h2 class="font-display font-bold text-lacivert leading-tight" style="font-size:clamp(2rem,5vw,3.2rem);">Bu <span class="text-turuncu">(</span>parantezi<span class="text-turuncu">)</span> kapat.</h2>
       <p class="mt-4 text-lacivert/60 font-body max-w-xl mx-auto">Büyük sözlere gerek yok. Küçük bir kararlılık yeter.</p>
      </div>
      <div class="fade-in-up mt-10">
@@ -1289,14 +1303,36 @@ const pledgeCardName = document.getElementById('pledgeCardName');
 const pledgeCountDisplay = document.getElementById('pledgeCountDisplay');
 const pledgeCountDone = document.getElementById('pledgeCountDone');
 
-let pledgeCount = Number(localStorage.getItem('pledgeCount') || 0);
+let pledgeCount = 0;
 
 function updatePledgeCountUI() {
   pledgeCountDisplay.textContent = pledgeCount;
   pledgeCountDone.textContent = pledgeCount;
 }
 
-updatePledgeCountUI();
+function loadPledgeCount() {
+  pledgeCountRef.once('value').then(snapshot => {
+    pledgeCount = Number(snapshot.val() || 0);
+    updatePledgeCountUI();
+  }).catch(err => {
+    console.error('Sayaç yüklenemedi:', err);
+  });
+}
+
+function incrementPledgeCount() {
+  pledgeCountRef.transaction(current => {
+    return (current || 0) + 1;
+  }, (error, committed, snapshot) => {
+    if (error) {
+      console.error('Sayaç güncellemesi başarısız:', error);
+    } else if (committed) {
+      pledgeCount = Number(snapshot.val() || 0);
+      updatePledgeCountUI();
+    }
+  });
+}
+
+loadPledgeCount();
 
 pledgeFormElement.addEventListener('submit', (e) => {
   e.preventDefault();
@@ -1310,11 +1346,9 @@ pledgeFormElement.addEventListener('submit', (e) => {
   }
 
   pledgeCardName.textContent = `${firstName} ${lastName}`;
-  pledgeCount += 1;
-  localStorage.setItem('pledgeCount', pledgeCount);
-  updatePledgeCountUI();
   pledgeContent.classList.add('hidden');
   pledgeDone.classList.remove('hidden');
+  incrementPledgeCount();
   lucide.createIcons();
 });
 
