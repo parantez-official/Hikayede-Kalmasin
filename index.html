@@ -7,23 +7,26 @@
   <title>PARANTEZ — Hikâyede Kalmasın</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
   <script src="/_sdk/element_sdk.js"></script>
   <script src="/_sdk/data_sdk.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&amp;family=DM+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <script>
     const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-      databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_PROJECT_ID.appspot.com",
-      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-      appId: "YOUR_APP_ID"
+      apiKey: "AIzaSyCtMDW02uu76OhN4T4jjxlUnLAeDkjPd_g",
+      authDomain: "hikayede-kalmasin.firebaseapp.com",
+      projectId: "hikayede-kalmasin",
+      storageBucket: "hikayede-kalmasin.firebasestorage.app",
+      messagingSenderId: "478212134838",
+      appId: "1:478212134838:web:b5e8227808eb623bf39317",
+      databaseURL: "https://hikayede-kalmasin-default-rtdb.firebaseio.com"
     };
+
     firebase.initializeApp(firebaseConfig);
-    const pledgeCountRef = firebase.database().ref('pledgeCount');
+    const db = firebase.database();
+    const pledgeCountRef = db.ref("pledgeCount");
 
     tailwind.config = {
       theme: {
@@ -40,7 +43,7 @@
           }
         }
       }
-    }
+    };
   </script>
   <style>
 html { height: 100%; }
@@ -279,9 +282,17 @@ textarea {
       <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/20 bg-white/5 backdrop-blur-sm"><span class="w-2 h-2 rounded-full bg-turuncu animate-pulse"></span> <span class="text-white/70 text-xs sm:text-sm font-body tracking-widest uppercase" id="hashtagDisplay">#HikâyedeKalmasın</span>
       </div>
      </div>
-     <h1 class="hero-anim-d1 font-display font-bold text-white leading-[0.9] tracking-tight" style="font-size:clamp(3rem,10vw,6rem);" id="heroTitle">HİKÂYEDE<br><span class="text-turuncu">KALMASIN</span></h1>
-     <p class="hero-anim-d2 mt-5 sm:mt-6 font-display text-white/80 font-medium" style="font-size:clamp(1rem,2.5vw,1.3rem);" 
-     <p class="hero-anim-d2 mt-4 max-w-2xl text-white/60 font-body leading-relaxed" style="font-size:clamp(0.875rem,1.5vw,1rem);">İzleyip geçtiğin şey, bir başkasının hayatında kalıcı bir iz olabilir. Sessiz kalma. Fark et, durdur, bildir.</p>
+     <h1 class="hero-anim-d1 font-display font-bold text-white leading-[0.9] tracking-tight" style="font-size:clamp(3rem,10vw,6rem);" id="heroTitle">
+  HİKÂYEDE<br><span class="text-turuncu">KALMASIN</span>
+</h1>
+
+<p class="hero-anim-d2 mt-5 sm:mt-6 font-display text-white/80 font-medium" style="font-size:clamp(1rem,2.5vw,1.3rem);" id="heroSubtitle">
+  Bu hikâyedeki <span class="text-turuncu font-bold">(</span>parantez<span class="text-turuncu font-bold">)</span> sensin.
+</p>
+
+<p class="hero-anim-d2 mt-4 max-w-2xl text-white/60 font-body leading-relaxed" style="font-size:clamp(0.875rem,1.5vw,1rem);">
+  İzleyip geçtiğin şey, bir başkasının hayatında kalıcı bir iz olabilir. Sessiz kalma. Fark et, durdur, bildir.
+</p>
      <div class="hero-anim-d3 flex flex-col sm:flex-row gap-3 sm:gap-4 mt-8 sm:mt-10 justify-center"><a href="#ne-yapabilirsin" class="inline-flex items-center justify-center gap-3 bg-turuncu text-white px-7 py-3.5 rounded-full font-body font-semibold text-base hover:bg-orange-600 transition-all hover:scale-105">
 
   <i data-lucide="lightbulb" class="w-5 h-5 text-white"></i>
@@ -790,22 +801,27 @@ Doğru bir müdahale ve tek bir parantezle, kötü bir anıdan güçlü bir daya
     <div class="max-w-4xl mx-auto text-center">
      <div class="fade-in-up"><span class="inline-block text-turuncu font-display font-bold text-sm tracking-[0.3em] uppercase mb-4">Söz Ver</span>
       <h2 class="font-display font-bold text-lacivert leading-tight" style="font-size:clamp(2rem,5vw,3.2rem);">Bu parantezi kapat.</h2>
-      <p class="mt-4 text-lacivert/60 font-body max-w-xl mx-auto">Büyük sözlere gerek yok. Küçük bir kararlılık yeter.</p>
+      <p class="mt-4 text-lacivert/60 font-body max-w-xl mx-auto">Söz ve, Hikayede Kalmasın Kartını al, Güçlü bir ailenin parçası ol.</p>
      </div>
      <div class="fade-in-up mt-10">
       <div id="pledgeCard" class="bg-white rounded-3xl p-8 sm:p-12 border border-lacivert/5 shadow-sm max-w-lg mx-auto">
        <div id="pledgeContent">
         <div class="w-16 h-16 rounded-full bg-turuncu/10 flex items-center justify-center mx-auto mb-6"><i data-lucide="heart-handshake" style="width:32px;height:32px;color:#F98513;"></i>
         </div>
-        <p class="font-body text-lacivert/80 leading-relaxed">"Bundan sonra gördüğümde geçmeyeceğim. Fark edeceğim, yanında duracağım ya da güvendiğim birine söyleyeceğim."</p>
-        <form id="pledgeFormElement" class="mt-8 space-y-4">
+        <p class="font-body text-lacivert/80 leading-relaxed">"Bundan sonra gördüğümde geçmeyeceğim. Fark edeceğim, yanında duracağım ya da güvendiğim birine söyleyeceğime söz veriyorum."</p>
+        <form id="pledgeFormElement" class="mt-8 space-y-4" onsubmit="return false;">
          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <label class="block text-left text-lacivert font-body text-sm">Ad<input id="pledgeFirstName" type="text" required class="mt-2 w-full rounded-2xl border border-lacivert/10 px-4 py-3 text-lacivert focus:border-turuncu focus:outline-none" placeholder="Adın" /></label>
           <label class="block text-left text-lacivert font-body text-sm">Soyad<input id="pledgeLastName" type="text" required class="mt-2 w-full rounded-2xl border border-lacivert/10 px-4 py-3 text-lacivert focus:border-turuncu focus:outline-none" placeholder="Soyadın" /></label>
          </div>
-         <button type="submit" class="w-full inline-flex items-center justify-center gap-2 bg-turuncu text-white px-8 py-3.5 rounded-full font-body font-semibold text-base hover:bg-orange-600 transition-all hover:scale-105"> <i data-lucide="check-circle" style="width:18px;height:18px;"></i> Hikâyede Kalmasın Kart Oluştur</button>
-         <p class="text-lacivert/60 text-sm">Ad soyad bilgisi sadece ekranda gösterilir. Gizlilik Esastır</p>
-         <p class="mt-4 text-lacivert/70 text-sm"><span id="pledgeCountDisplay">0</span> kişi şimdiye kadar söz verdi.</p>
+         <button id="createCardBtn" type="button" onclick="kartOlustur()" class="w-full inline-flex items-center justify-center gap-2 bg-turuncu text-white px-8 py-3.5 rounded-full font-body font-semibold text-base hover:bg-orange-600 transition-all hover:scale-105">
+  <i data-lucide="check-circle" style="width:18px;height:18px;"></i>
+  Hikâyede Kalmasın Kart Oluştur
+</button>
+
+<p class="mt-4 text-center text-lacivert/70 font-body text-sm">
+  Oluşturulan toplam kart: <span id="counter">0</span>
+</p>
         </form>
        </div>
        <div id="pledgeDone" class="hidden">
@@ -815,12 +831,18 @@ Doğru bir müdahale ve tek bir parantezle, kötü bir anıdan güçlü bir daya
         <p class="mt-3 font-body text-lacivert/60">Bu kart şimdi ekranda. Dilersen ekran görüntüsü alabilirsin.</p>
         <div class="mt-6 rounded-3xl border border-turuncu/20 bg-turuncu/10 p-6 text-left">
          <p class="text-turuncu font-display font-bold text-sm uppercase tracking-[0.2em] mb-2">Hikâyede Kalmasın Kart</p>
-         <div class="rounded-3xl bg-white p-6 shadow-sm">
-          <p class="text-lacivert/60 text-sm">Ad Soyad</p>
+         <div id="pledgeCardImage" class="bg-white rounded-3xl border border-lacivert/10 shadow-sm p-6 sm:p-8">
+          <p class="text-lacivert/60 text-sm">#hikâyedekalmasın</p>
           <p class="mt-1 font-display font-bold text-lacivert text-2xl" id="pledgeCardName"></p>
+          <p class="mt-4 text-lacivert/70 text-sm">Hikâyede Kalma, Zorbalığa Hayır De!</p>
           <p class="mt-4 text-lacivert/70 text-sm">Bu kart, hikâyede kalmamaya verdiğin sözün simgesidir.</p>
-          <p class="mt-4 text-lacivert/80 text-sm"><span id="pledgeCountDone">0</span> kişi şu ana kadar söz verdi.</p>
+          <p class="mt-4 text-lacivert/80 text-sm"><span id="pledgeCountDone">0</span> kişilik ailenin bir parçası oldun.</p>
+          <p class="mt-6 text-turuncu font-display font-bold text-sm">Hikâyede Kalmasın Kampanya Katılım Kartı</p>
          </div>
+         <button id="downloadCardBtn" type="button" class="mt-6 w-full inline-flex items-center justify-center gap-2 bg-lacivert text-white px-8 py-3.5 rounded-full font-body font-semibold text-base hover:bg-mavi transition-all hover:scale-105">
+           <i data-lucide="download" style="width:18px;height:18px;"></i>
+           Kartı İndir
+         </button>
         </div>
         <p class="mt-4 font-display font-bold text-turuncu text-lg" id="pledgeHashtag">#HikâyedeKalmasın</p>
        </div>
@@ -1296,7 +1318,6 @@ reportForm.addEventListener('submit', async (e) => {
     document.getElementById('submitBtnText').textContent = 'Bildir';
   }
 });
-const pledgeFormElement = document.getElementById('pledgeFormElement');
 const pledgeContent = document.getElementById('pledgeContent');
 const pledgeDone = document.getElementById('pledgeDone');
 const pledgeCardName = document.getElementById('pledgeCardName');
@@ -1306,8 +1327,12 @@ const pledgeCountDone = document.getElementById('pledgeCountDone');
 let pledgeCount = 0;
 
 function updatePledgeCountUI() {
-  pledgeCountDisplay.textContent = pledgeCount;
-  pledgeCountDone.textContent = pledgeCount;
+  if (pledgeCountDisplay) {
+    pledgeCountDisplay.textContent = pledgeCount;
+  }
+  if (pledgeCountDone) {
+    pledgeCountDone.textContent = pledgeCount;
+  }
 }
 
 function loadPledgeCount() {
@@ -1333,24 +1358,6 @@ function incrementPledgeCount() {
 }
 
 loadPledgeCount();
-
-pledgeFormElement.addEventListener('submit', (e) => {
-  e.preventDefault();
-
-  const firstName = document.getElementById('pledgeFirstName').value.trim();
-  const lastName = document.getElementById('pledgeLastName').value.trim();
-
-  if (!firstName || !lastName) {
-    alert('Lütfen ad ve soyadınızı girin.');
-    return;
-  }
-
-  pledgeCardName.textContent = `${firstName} ${lastName}`;
-  pledgeContent.classList.add('hidden');
-  pledgeDone.classList.remove('hidden');
-  incrementPledgeCount();
-  lucide.createIcons();
-});
 
 // Smooth scroll for anchor links
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -1475,9 +1482,111 @@ forumForm.addEventListener('submit', async (e) => {
    
   </script>
   <script>
-    if (window.lucide && typeof lucide.createIcons === 'function') {
-      lucide.createIcons();
+const CARD_STORAGE_KEY = "hikayedeKalmasinCardCreated";
+
+function bilgiKutusuGoster() {
+  const pledgeContent = document.getElementById("pledgeContent");
+  const pledgeDone = document.getElementById("pledgeDone");
+
+  if (pledgeContent && pledgeDone) {
+    pledgeContent.classList.add("hidden");
+    pledgeDone.classList.remove("hidden");
+  }
+}
+
+function butonuKapat() {
+  const btn = document.getElementById("createCardBtn");
+  if (!btn) return;
+
+  btn.disabled = true;
+  btn.classList.add("opacity-60", "cursor-not-allowed");
+  btn.classList.remove("hover:bg-orange-600", "hover:scale-105");
+  btn.innerHTML = `
+    <i data-lucide="check-check" style="width:18px;height:18px;"></i>
+    Kartın Oluşturuldu
+  `;
+  lucide.createIcons();
+}
+
+function kartOlustur() {
+  const alreadyCreated = localStorage.getItem(CARD_STORAGE_KEY);
+  const firstName = document.getElementById("pledgeFirstName")?.value.trim() || "";
+  const lastName = document.getElementById("pledgeLastName")?.value.trim() || "";
+  const fullName = `${firstName} ${lastName}`.trim();
+
+  if (!firstName || !lastName) {
+    return;
+  }
+
+  if (typeof pledgeCardName !== "undefined" && pledgeCardName) {
+    pledgeCardName.textContent = fullName;
+  }
+
+  if (alreadyCreated === "true") {
+    bilgiKutusuGoster();
+    butonuKapat();
+    return;
+  }
+
+  pledgeCountRef.transaction((current) => {
+    return (current || 0) + 1;
+  }, (error, committed) => {
+    if (error) {
+      console.error("Sayaç güncellenemedi:", error);
+      return;
     }
+
+    if (committed) {
+      localStorage.setItem(CARD_STORAGE_KEY, "true");
+      bilgiKutusuGoster();
+      butonuKapat();
+    }
+  });
+}
+
+function kartiIndir() {
+  const card = document.getElementById("pledgeCardImage");
+  if (!card) return;
+
+  html2canvas(card, {
+    scale: 2,
+    backgroundColor: null
+  }).then((canvas) => {
+    const link = document.createElement("a");
+    link.download = "hikayede-kalmasin-karti.png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  });
+}
+
+pledgeCountRef.on("value", (snapshot) => {
+  const pledgeCount = Number(snapshot.val() || 0);
+
+  const counterEl = document.getElementById("counter");
+  if (counterEl) {
+    counterEl.textContent = pledgeCount;
+  }
+
+  if (typeof updatePledgeCountUI === "function") {
+    updatePledgeCountUI();
+  }
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  const alreadyCreated = localStorage.getItem(CARD_STORAGE_KEY);
+
+  if (alreadyCreated === "true") {
+    butonuKapat();
+  }
+
+  const downloadBtn = document.getElementById("downloadCardBtn");
+  if (downloadBtn) {
+    downloadBtn.addEventListener("click", kartiIndir);
+  }
+
+  lucide.createIcons();
+});
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
  <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9eac7e91228323a8',t:'MTc3NTkzNjc1NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
