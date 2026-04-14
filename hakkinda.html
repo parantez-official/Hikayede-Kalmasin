@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="tr" class="h-full">
+<head>
+  <link rel="icon" type="image/png" href="logo.png">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hakkında — PARANTEZ</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            turuncu: '#F98513',
+            mavi: '#223382',
+            lacivert: '#111144',
+            zemin: '#F4F1EC',
+          },
+          fontFamily: {
+            display: ['Oswald', 'sans-serif'],
+            body: ['DM Sans', 'sans-serif'],
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="min-h-full bg-zemin text-lacivert font-body">
+
+  <nav class="sticky top-0 z-50 bg-[#F4F1EC]/90 backdrop-blur border-b border-[#111144]/10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <a href="./index.html">
+        <img src="logo.png" alt="Parantez Logo" class="h-24 w-auto">
+      </a>
+      <div class="hidden md:flex items-center gap-6 text-sm font-medium">
+        <a href="./index.html" class="hover:text-turuncu">Ana Sayfa</a>
+        <a href="./sss.html" class="hover:text-turuncu">SSS</a>
+        <a href="./hakkinda.html" class="text-turuncu font-semibold">Hakkında</a>
+        <a href="./biz-kimiz.html" class="hover:text-turuncu">Biz Kimiz?</a>
+        <a href="./nasil-yapacagiz.html" class="hover:text-turuncu">Nasıl Yapacağız?</a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="py-16 sm:py-24 px-5 sm:px-8">
+    <div class="max-w-5xl mx-auto">
+      <div class="text-center mb-14">
+        <span class="inline-block text-turuncu font-display font-bold text-sm tracking-[0.3em] uppercase mb-4">Parantez</span>
+        <h1 class="font-display font-bold text-4xl sm:text-6xl leading-tight">Hakkında</h1>
+        <p class="mt-4 text-lacivert/70 max-w-2xl mx-auto">
+          Parantez, zorbalığın görünmezleşmesine karşı kurulan; fark etmeyi, yanında durmayı ve güvenli şekilde harekete geçmeyi teşvik eden bir sosyal etki girişimidir.
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="bg-white rounded-3xl p-8 border border-lacivert/10">
+          <h2 class="font-display font-bold text-2xl mb-4">Neden Var?</h2>
+          <p class="text-lacivert/70 leading-relaxed">
+            Çünkü birçok zorbalık olayı yaşanıp geçiyor, görülüyor ama müdahale edilmiyor. O an kapanıyor gibi görünse de etkisi uzun süre sürüyor. Parantez bu sessizliği kırmak için var.
+          </p>
+        </div>
+
+        <div class="bg-lacivert rounded-3xl p-8 text-white">
+          <h2 class="font-display font-bold text-2xl mb-4">Ne Amaçlıyor?</h2>
+          <p class="text-white/75 leading-relaxed">
+            Tanık olan kişiyi pasif izleyici olmaktan çıkarıp, güvenli ve onarıcı bir değişimin parçası haline getirmeyi amaçlıyor.
+          </p>
+        </div>
+
+        <div class="bg-white rounded-3xl p-8 border border-lacivert/10">
+          <h2 class="font-display font-bold text-2xl mb-4">Nasıl Yaklaşıyor?</h2>
+          <p class="text-lacivert/70 leading-relaxed">
+            Korku, çekinme ve yalnızlık duygusunu azaltan bir dil kurarak; anonimlik, güvenlik, farkındalık ve dayanışma ekseninde ilerliyor.
+          </p>
+        </div>
+
+        <div class="bg-white rounded-3xl p-8 border border-lacivert/10">
+          <h2 class="font-display font-bold text-2xl mb-4">Kimin İçin?</h2>
+          <p class="text-lacivert/70 leading-relaxed">
+            Öğrenciler, eğitim ortamları, rehberlik mekanizmaları ve daha sağlıklı bir okul kültürü inşa etmek isteyen herkes için.
+          </p>
+        </div>
+      </div>
+
+      <div class="mt-10 bg-turuncu rounded-3xl p-8 text-white text-center">
+        <p class="font-display font-bold text-2xl sm:text-3xl">
+          Bir şey gördüğünde sadece izleme. <br> Parantez ol.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="border-t border-lacivert/10 py-8 px-5 sm:px-8">
+    <div class="max-w-7xl mx-auto text-center text-sm text-lacivert/60">
+      PARANTEZ — Hikâyede Kalmasın
+    </div>
+  </footer>
+</body>
+</html>

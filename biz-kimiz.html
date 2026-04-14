@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="tr" class="h-full">
+<head>
+  <link rel="icon" type="image/png" href="logo.png">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Biz Kimiz? — PARANTEZ</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            turuncu: '#F98513',
+            mavi: '#223382',
+            lacivert: '#111144',
+            zemin: '#F4F1EC',
+          },
+          fontFamily: {
+            display: ['Oswald', 'sans-serif'],
+            body: ['DM Sans', 'sans-serif'],
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="min-h-full bg-zemin text-lacivert font-body">
+
+  <!-- NAV -->
+  <nav class="sticky top-0 z-50 bg-[#F4F1EC]/90 backdrop-blur border-b border-[#111144]/10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <a href="./index.html">
+        <img src="logo.png" alt="Parantez Logo" class="h-24 w-auto">
+      </a>
+
+      <div class="hidden md:flex items-center gap-6 text-sm font-medium">
+        <a href="./index.html" class="hover:text-turuncu transition-colors">Ana Sayfa</a>
+        <a href="./sss.html" class="hover:text-turuncu transition-colors">SSS</a>
+        <a href="./hakkinda.html" class="hover:text-turuncu transition-colors">Hakkında</a>
+        <a href="./biz-kimiz.html" class="text-turuncu font-semibold">Biz Kimiz?</a>
+        <a href="./nasil-yapacagiz.html" class="hover:text-turuncu transition-colors">Nasıl Yapacağız?</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO / EKİP GÖRSELİ -->
+  <section class="pt-16 sm:pt-20 pb-10 px-5 sm:px-8">
+    <div class="max-w-6xl mx-auto text-center">
+      <span class="inline-block text-turuncu font-display font-bold text-sm tracking-[0.3em] uppercase mb-4">Ekip</span>
+      <h1 class="font-display font-bold text-4xl sm:text-6xl leading-tight">Biz Kimiz?</h1>
+      <p class="mt-4 text-lacivert/70 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed">
+        Parantez; güvenli okul kültürü, öğrenci dayanışması ve zorbalığa karşı farkındalık geliştirmeyi amaçlayan bir oluşumdur.
+      </p>
+
+      <div class="mt-10 bg-gradient-to-b from-white to-[#f7f4ef] rounded-[2rem] p-4 sm:p-8 border border-lacivert/10 shadow-sm">
+        <img
+          src="./ekip.png"
+          alt="Parantez ekibi"
+          class="w-full max-w-5xl mx-auto h-auto object-contain"
+        >
+      </div>
+    </div>
+  </section>
+
+  <!-- İÇERİK -->
+  <section class="pb-16 sm:pb-24 px-5 sm:px-8">
+    <div class="max-w-6xl mx-auto">
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="bg-white rounded-3xl p-8 border border-lacivert/10">
+          <h2 class="font-display font-bold text-2xl mb-4">Ne Savunuyoruz?</h2>
+          <p class="text-lacivert/70 leading-relaxed">
+            Sessizliğin normalleşmemesini, zorbalığın görünmezleşmemesini ve dayanışmanın güçlenmesini savunuyoruz.
+          </p>
+        </div>
+
+        <div class="bg-white rounded-3xl p-8 border border-lacivert/10">
+          <h2 class="font-display font-bold text-2xl mb-4">Nasıl Bir Ekibiz?</h2>
+          <p class="text-lacivert/70 leading-relaxed">
+            Yalnızca bir kampanya değil; iletişim, farkındalık, güvenli yönlendirme ve sosyal etki odağıyla düşünen bir yapı kuruyoruz.
+          </p>
+        </div>
+
+        <div class="bg-white rounded-3xl p-8 border border-lacivert/10">
+          <h2 class="font-display font-bold text-2xl mb-4">Neye İnanıyoruz?</h2>
+          <p class="text-lacivert/70 leading-relaxed">
+            Bazen sadece bir kişinin yanında durması bile bir hikâyenin yönünü tamamen değiştirebilir.
+          </p>
+        </div>
+      </div>
+
+      <div class="mt-10 bg-lacivert rounded-3xl p-8 sm:p-10 text-white">
+        <h2 class="font-display font-bold text-3xl mb-4">Bizim yaklaşımımız</h2>
+        <p class="text-white/75 leading-relaxed text-base sm:text-lg">
+          Biz, zorbalığa karşı sadece tepki veren değil; önceden fark eden, güvenli şekilde yönlendiren ve topluluk kültürünü dönüştürmeye çalışan bir anlayışı benimsiyoruz. Parantez’in amacı yalnızca bir şey söylemek değil, gerçekten bir şey değiştirmek.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="w-full bg-lacivert text-white px-6 sm:px-10 lg:px-16 py-12">
+    <div class="max-w-7xl mx-auto">
+      <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-10">
+        <div>
+          <h3 class="font-display font-bold text-4xl text-white">PARANTEZ</h3>
+          <p class="mt-3 text-white/60 font-body text-lg">
+            Hikâyede Kalmasın — Akran Zorbalığına Karşı Farkındalık Kampanyası
+          </p>
+        </div>
+
+        <div class="lg:text-right">
+          <p class="font-display font-bold text-turuncu text-3xl">#HikâyedeKalmasın</p>
+        </div>
+      </div>
+
+      <div class="mt-10 border-t border-white/10 pt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div>
+          <h4 class="font-display font-semibold text-white text-xl mb-4">Hızlı Bağlantılar</h4>
+          <div class="flex flex-wrap gap-x-6 gap-y-3 text-white/70 font-body">
+            <a href="./index.html" class="hover:text-turuncu transition-colors">Ana Sayfa</a>
+            <a href="./sss.html" class="hover:text-turuncu transition-colors">SSS</a>
+            <a href="./hakkinda.html" class="hover:text-turuncu transition-colors">Hakkında</a>
+            <a href="./biz-kimiz.html" class="hover:text-turuncu transition-colors">Biz Kimiz?</a>
+            <a href="./nasil-yapacagiz.html" class="hover:text-turuncu transition-colors">Nasıl Yapacağız?</a>
+          </div>
+        </div>
+
+        <div class="md:text-right">
+          <p class="text-white/45 font-body text-sm">
+            Bu site bir sosyal farkındalık kampanyasıdır. Hiçbir kişisel veri toplanmamaktadır.
+          </p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

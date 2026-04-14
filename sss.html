@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="tr" class="h-full">
+<head>
+  <link rel="icon" type="image/png" href="logo.png">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SSS — PARANTEZ</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            turuncu: '#F98513',
+            mavi: '#223382',
+            lacivert: '#111144',
+            zemin: '#F4F1EC',
+          },
+          fontFamily: {
+            display: ['Oswald', 'sans-serif'],
+            body: ['DM Sans', 'sans-serif'],
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #F4F1EC;
+      color: #111144;
+    }
+    .faq-item {
+      transition: all 0.3s ease;
+    }
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease;
+    }
+    .faq-item.active .faq-answer {
+      max-height: 300px;
+    }
+    .faq-item.active .faq-icon {
+      transform: rotate(180deg);
+    }
+    .faq-icon {
+      transition: transform 0.3s ease;
+    }
+  </style>
+</head>
+<body class="min-h-full">
+
+  <nav class="sticky top-0 z-50 bg-[#F4F1EC]/90 backdrop-blur border-b border-[#111144]/10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <a href="./index.html" class="flex items-center gap-3">
+        <img src="logo.png" alt="Parantez Logo" class="h-24 w-auto">
+      </a>
+      <div class="hidden md:flex items-center gap-6 font-body text-sm font-medium">
+        <a href="./index.html" class="hover:text-turuncu transition-colors">Ana Sayfa</a>
+        <a href="./sss.html" class="text-turuncu font-semibold">SSS</a>
+        <a href="./hakkinda.html" class="hover:text-turuncu transition-colors">Hakkında</a>
+        <a href="./biz-kimiz.html" class="hover:text-turuncu transition-colors">Biz Kimiz?</a>
+        <a href="./nasil-yapacagiz.html" class="hover:text-turuncu transition-colors">Nasıl Yapacağız?</a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="py-16 sm:py-24 px-5 sm:px-8">
+    <div class="max-w-4xl mx-auto">
+      <div class="text-center mb-12">
+        <span class="inline-block text-turuncu font-display font-bold text-sm tracking-[0.3em] uppercase mb-4">Bilgi</span>
+        <h1 class="font-display font-bold text-lacivert leading-tight text-4xl sm:text-6xl">Sıkça Sorulan Sorular</h1>
+        <p class="mt-4 text-lacivert/70 font-body max-w-2xl mx-auto">
+          Parantez hakkında en çok merak edilen soruları burada topladık.
+        </p>
+      </div>
+
+      <div class="space-y-4">
+        <div class="faq-item bg-white rounded-3xl border border-lacivert/10 overflow-hidden">
+          <button class="faq-question w-full flex items-center justify-between text-left px-6 py-5">
+            <span class="font-semibold text-lg">Parantez nedir?</span>
+            <i data-lucide="chevron-down" class="faq-icon w-5 h-5 text-turuncu"></i>
+          </button>
+          <div class="faq-answer px-6">
+            <p class="pb-5 text-lacivert/70 leading-relaxed">
+              Parantez, zorbalığa karşı farkındalık oluşturmayı, güvenli bildirim kültürünü yaygınlaştırmayı ve öğrencilerin yalnız kalmamasını amaçlayan bir sosyal etki platformudur.
+            </p>
+          </div>
+        </div>
+
+        <div class="faq-item bg-white rounded-3xl border border-lacivert/10 overflow-hidden">
+          <button class="faq-question w-full flex items-center justify-between text-left px-6 py-5">
+            <span class="font-semibold text-lg">Bu platform kimler için?</span>
+            <i data-lucide="chevron-down" class="faq-icon w-5 h-5 text-turuncu"></i>
+          </button>
+          <div class="faq-answer px-6">
+            <p class="pb-5 text-lacivert/70 leading-relaxed">
+              Öğrenciler, tanık olan kişiler, öğretmenler, rehberlik birimleri ve daha güvenli okul ortamları isteyen herkes için.
+            </p>
+          </div>
+        </div>
+
+        <div class="faq-item bg-white rounded-3xl border border-lacivert/10 overflow-hidden">
+          <button class="faq-question w-full flex items-center justify-between text-left px-6 py-5">
+            <span class="font-semibold text-lg">Bildirimler anonim mi?</span>
+            <i data-lucide="chevron-down" class="faq-icon w-5 h-5 text-turuncu"></i>
+          </button>
+          <div class="faq-answer px-6">
+            <p class="pb-5 text-lacivert/70 leading-relaxed">
+              Evet. Kullanıcı güvenliği ve gizlilik temel önceliklerimizden biri. Sistem, mümkün olan en güvenli paylaşım deneyimini sunmayı hedefler.
+            </p>
+          </div>
+        </div>
+
+        <div class="faq-item bg-white rounded-3xl border border-lacivert/10 overflow-hidden">
+          <button class="faq-question w-full flex items-center justify-between text-left px-6 py-5">
+            <span class="font-semibold text-lg">Bir tanık olarak ne yapabilirim?</span>
+            <i data-lucide="chevron-down" class="faq-icon w-5 h-5 text-turuncu"></i>
+          </button>
+          <div class="faq-answer px-6">
+            <p class="pb-5 text-lacivert/70 leading-relaxed">
+              Durumu fark etmek, mağduru yalnız bırakmamak, grup dinamiğini kırmak ve güvenli şekilde bildirmek önemli ilk adımlardır.
+            </p>
+          </div>
+        </div>
+
+        <div class="faq-item bg-white rounded-3xl border border-lacivert/10 overflow-hidden">
+          <button class="faq-question w-full flex items-center justify-between text-left px-6 py-5">
+            <span class="font-semibold text-lg">Parantez sadece dijital zorbalık için mi?</span>
+            <i data-lucide="chevron-down" class="faq-icon w-5 h-5 text-turuncu"></i>
+          </button>
+          <div class="faq-answer px-6">
+            <p class="pb-5 text-lacivert/70 leading-relaxed">
+              Hayır. Fiziksel, sözel, sosyal ve dijital zorbalık dahil olmak üzere farklı türlerdeki zorbalıklara karşı farkındalık üretir.
+            </p>
+          </div>
+        </div>
+
+        <div class="faq-item bg-white rounded-3xl border border-lacivert/10 overflow-hidden">
+          <button class="faq-question w-full flex items-center justify-between text-left px-6 py-5">
+            <span class="font-semibold text-lg">Gençlere nasıl ulaşıyorsunuz?</span>
+            <i data-lucide="chevron-down" class="faq-icon w-5 h-5 text-turuncu"></i>
+          </button>
+          <div class="faq-answer px-6">
+            <p class="pb-5 text-lacivert/70 leading-relaxed">
+              Öğrencilere etkin ve sürdürülebilir şekilde ulaşabilmek adına, başta Millî Eğitim Bakanlığı ve Aile ve Sosyal Hizmetler Bakanlığı olmak üzere, alanla doğrudan ilişkili kamu kurumlarıyla resmi iş birlikleri ve protokoller geliştirmeyi temel erişim stratejimiz olarak konumlandırıyoruz.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="border-t border-lacivert/10 py-8 px-5 sm:px-8">
+    <div class="max-w-7xl mx-auto text-center text-sm text-lacivert/60">
+      PARANTEZ — Hikâyede Kalmasın
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+
+    document.querySelectorAll('.faq-question').forEach(button => {
+      button.addEventListener('click', () => {
+        const item = button.parentElement;
+        item.classList.toggle('active');
+      });
+    });
+  </script>
+</body>
+</html>

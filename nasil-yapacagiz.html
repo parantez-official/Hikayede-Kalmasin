@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="tr" class="h-full">
+<head>
+  <link rel="icon" type="image/png" href="logo.png">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nasıl Yapacağız? — PARANTEZ</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            turuncu: '#F98513',
+            mavi: '#223382',
+            lacivert: '#111144',
+            zemin: '#F4F1EC',
+          },
+          fontFamily: {
+            display: ['Oswald', 'sans-serif'],
+            body: ['DM Sans', 'sans-serif'],
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="min-h-full bg-zemin text-lacivert font-body">
+
+  <nav class="sticky top-0 z-50 bg-[#F4F1EC]/90 backdrop-blur border-b border-[#111144]/10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <a href="./index.html">
+        <img src="logo.png" alt="Parantez Logo" class="h-24 w-auto">
+      </a>
+      <div class="hidden md:flex items-center gap-6 text-sm font-medium">
+        <a href="./index.html" class="hover:text-turuncu">Ana Sayfa</a>
+        <a href="./sss.html" class="hover:text-turuncu">SSS</a>
+        <a href="./hakkinda.html" class="hover:text-turuncu">Hakkında</a>
+        <a href="./biz-kimiz.html" class="hover:text-turuncu">Biz Kimiz?</a>
+        <a href="./nasil-yapacagiz.html" class="text-turuncu font-semibold">Nasıl Yapacağız?</a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="py-16 sm:py-24 px-5 sm:px-8">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-14">
+        <span class="inline-block text-turuncu font-display font-bold text-sm tracking-[0.3em] uppercase mb-4">Yol Haritası</span>
+        <h1 class="font-display font-bold text-4xl sm:text-6xl leading-tight">Nasıl Yapacağız?</h1>
+        <p class="mt-4 text-lacivert/70 max-w-2xl mx-auto">
+          Parantez, farkındalık, güvenli yönlendirme ve topluluk desteği üzerinden ilerleyen bütüncül bir yapı olarak kurgulanır.
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="bg-white rounded-3xl p-8 border border-lacivert/10">
+          <div class="w-14 h-14 rounded-2xl bg-turuncu/10 flex items-center justify-center mb-5">
+            <i data-lucide="eye" class="w-7 h-7 text-turuncu"></i>
+          </div>
+          <h2 class="font-display font-bold text-2xl mb-3">1. Fark Ettir</h2>
+          <p class="text-lacivert/70 leading-relaxed">
+            Zorbalığın görünmeyen biçimlerini görünür hale getirerek öğrencilerin bunu tanımasını sağlarız.
+          </p>
+        </div>
+
+        <div class="bg-white rounded-3xl p-8 border border-lacivert/10">
+          <div class="w-14 h-14 rounded-2xl bg-turuncu/10 flex items-center justify-center mb-5">
+            <i data-lucide="users" class="w-7 h-7 text-turuncu"></i>
+          </div>
+          <h2 class="font-display font-bold text-2xl mb-3">2. Yalnız Bırakma</h2>
+          <p class="text-lacivert/70 leading-relaxed">
+            Mağdurun ya da tanığın kendini yalnız hissetmediği bir destek ve dayanışma dili üretiriz.
+          </p>
+        </div>
+
+        <div class="bg-white rounded-3xl p-8 border border-lacivert/10">
+          <div class="w-14 h-14 rounded-2xl bg-turuncu/10 flex items-center justify-center mb-5">
+            <i data-lucide="shield" class="w-7 h-7 text-turuncu"></i>
+          </div>
+          <h2 class="font-display font-bold text-2xl mb-3">3. Güvenli Alan Kur</h2>
+          <p class="text-lacivert/70 leading-relaxed">
+            Korku üretmeyen, güven veren ve gerektiğinde anonim kalınabilen bir bildirim mantığı sunarız.
+          </p>
+        </div>
+
+        <div class="bg-white rounded-3xl p-8 border border-lacivert/10">
+          <div class="w-14 h-14 rounded-2xl bg-turuncu/10 flex items-center justify-center mb-5">
+            <i data-lucide="refresh-cw" class="w-7 h-7 text-turuncu"></i>
+          </div>
+          <h2 class="font-display font-bold text-2xl mb-3">4. Kültürü Dönüştür</h2>
+          <p class="text-lacivert/70 leading-relaxed">
+            Tekil olaylara tepki vermekle kalmayıp okul kültüründe kalıcı bir farkındalık ve refleks oluşturmayı hedefleriz.
+          </p>
+        </div>
+      </div>
+
+      <div class="mt-10 bg-lacivert rounded-3xl p-8 sm:p-10 text-white">
+        <h2 class="font-display font-bold text-3xl mb-4">Uzun vadeli yaklaşım</h2>
+        <p class="text-white/75 leading-relaxed text-base sm:text-lg">
+          Bu yapı, kısa süreli bir kampanya mantığından ziyade sürdürülebilir bir sistem gibi düşünülür. İçerik, yönlendirme, destek ve görünürlük katmanları birlikte çalışarak zamanla daha güvenli bir sosyal çevre oluşturur. Öğrencilere etkin ve sürdürülebilir şekilde ulaşabilmek adına, başta Millî Eğitim Bakanlığı ve Aile ve Sosyal Hizmetler Bakanlığı olmak üzere, alanla doğrudan ilişkili kamu kurumlarıyla resmi iş birlikleri ve protokoller geliştirmeyi temel erişim stratejimiz olarak konumlandırıyoruz.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="border-t border-lacivert/10 py-8 px-5 sm:px-8">
+    <div class="max-w-7xl mx-auto text-center text-sm text-lacivert/60">
+      PARANTEZ — Hikâyede Kalmasın
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>
