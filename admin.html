@@ -1,0 +1,1052 @@
+<!doctype html>
+<html lang="tr" class="h-full">
+<head>
+  <link rel="icon" type="image/png" href="logo.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PARANTEZ Admin Paneli</title>
+
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            turuncu: '#F98513',
+            mavi: '#223382',
+            lacivert: '#111144',
+            zemin: '#F4F1EC',
+            kart: '#FBF9F5',
+          },
+          fontFamily: {
+            display: ['Oswald', 'sans-serif'],
+            body: ['DM Sans', 'sans-serif'],
+          },
+          boxShadow: {
+            soft: '0 10px 30px rgba(17,17,68,0.08)',
+            softlg: '0 18px 50px rgba(17,17,68,0.12)',
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: #F8FAFC;
+      color: #0F172A;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .glass {
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .story-card {
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+    .story-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 14px 28px rgba(15,23,42,0.08);
+    }
+
+    details > summary {
+      list-style: none;
+    }
+
+    details > summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details > summary {
+      padding-right: 0.5rem;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar-thumb {
+      background: rgba(15,23,42,0.16);
+      border-radius: 999px;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .pill-active {
+      background: #0F172A;
+      color: white;
+      border-color: #0F172A;
+    }
+  </style>
+</head>
+<body class="h-full">
+
+  <div class="min-h-full">
+    <!-- TOP BAR -->
+    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-200 shadow-sm">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-2xl bg-slate-900 text-white flex items-center justify-center shadow-sm">
+            <i data-lucide="shield-check" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <p class="font-display text-2xl sm:text-3xl font-bold leading-none">PARANTEZ</p>
+            <p class="text-slate-500 text-sm">Admin Moderasyon Paneli</p>
+          </div>
+        </div>
+
+        <div class="hidden md:flex items-center gap-3">
+          <a href="./index.html" class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-slate-200 text-slate-700 hover:border-slate-900 hover:text-slate-900 transition-colors">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i>
+            Siteye Dön
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <!-- HERO -->
+      <section class="mb-8">
+        <div class="rounded-3xl bg-white border border-slate-200 p-6 sm:p-8 shadow-sm">
+          <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+            <div class="max-w-2xl">
+              <p class="uppercase tracking-[0.24em] text-slate-500 text-sm font-semibold">Moderasyon</p>
+              <h1 class="mt-3 text-3xl sm:text-4xl font-display font-bold text-slate-950">Bekleyen Hikâyeler</h1>
+              <p class="mt-3 text-slate-600 leading-relaxed">Kullanıcı gönderilerini burada takip et, gerekli gördüğün metinleri kontrol ederek hızlıca onayla veya reddet.</p>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full lg:w-auto">
+              <div class="rounded-3xl bg-slate-50 border border-slate-200 p-4">
+                <p class="text-slate-500 text-xs uppercase tracking-wider">Bekleyen</p>
+                <p id="pendingCount" class="font-display text-3xl font-bold mt-2 text-slate-950">0</p>
+              </div>
+              <div class="rounded-3xl bg-slate-50 border border-slate-200 p-4">
+                <p class="text-slate-500 text-xs uppercase tracking-wider">Onaylanan</p>
+                <p id="approvedCount" class="font-display text-3xl font-bold mt-2 text-slate-950">0</p>
+              </div>
+              <div class="rounded-3xl bg-slate-50 border border-slate-200 p-4">
+                <p class="text-slate-500 text-xs uppercase tracking-wider">Reddedilen</p>
+                <p id="rejectedCount" class="font-display text-3xl font-bold mt-2 text-slate-950">0</p>
+              </div>
+              <div class="rounded-3xl bg-slate-50 border border-slate-200 p-4">
+                <p class="text-slate-500 text-xs uppercase tracking-wider">Anonim</p>
+                <p id="anonymousCount" class="font-display text-3xl font-bold mt-2 text-slate-950">0</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FILTER BAR -->
+      <section class="mb-6">
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-4 sm:p-5">
+          <div class="grid grid-cols-1 lg:grid-cols-[1.4fr_.9fr_.9fr_auto] gap-4 items-center">
+            <div class="relative">
+              <i data-lucide="search" class="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+              <input
+                id="searchInput"
+                type="text"
+                placeholder="Metin içinde ara..."
+                class="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-200 bg-slate-50 outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-200"
+              >
+            </div>
+
+            <select id="typeFilter" class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-slate-50 outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-200">
+              <option value="all">Tüm Türler</option>
+              <option value="victim">Bana Yapıldı</option>
+              <option value="witness">Tanık Oldum</option>
+              <option value="intervene">Ben Müdahale Ettim</option>
+            </select>
+
+            <button id="anonymousFilterBtn" class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-slate-50 text-slate-700 hover:border-slate-900 hover:text-slate-900 transition-colors">
+              Sadece Anonim
+            </button>
+
+            <button id="refreshBtn" class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-slate-900 text-white hover:bg-slate-800 transition-colors">
+              <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+              Yenile
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="mb-6">
+        <div class="bg-white rounded-[2rem] border border-lacivert/8 shadow-soft p-6">
+          <div class="grid gap-6 lg:grid-cols-[1fr_360px]">
+            <div class="space-y-6">
+              <div>
+                <p class="text-sm uppercase tracking-[0.24em] text-turuncu font-semibold">Anında Bildir</p>
+                <h2 class="font-display text-3xl font-bold">İhbar Paneli</h2>
+                <p class="mt-3 text-lacivert/70">Yeni ihbarlar geldiğinde buradan hızlıca takip edebilirsin. Harita yok, sadece doğrudan ihbar bilgisi.</p>
+              </div>
+
+              <div class="grid gap-4 sm:grid-cols-2">
+                <div class="rounded-[2rem] bg-slate-50/80 border border-slate-200 p-6">
+                  <p class="text-sm uppercase tracking-[0.24em] text-turuncu font-semibold">Toplam İhbar</p>
+                  <p id="hotlineTotalCount" class="font-display text-5xl font-bold text-slate-900 mt-4">0</p>
+                  <p class="text-sm text-slate-700/70 mt-2">En son raporlanan ihbar sayısı</p>
+                </div>
+                <div class="rounded-[2rem] bg-slate-50/80 border border-slate-200 p-6">
+                  <p class="text-sm uppercase tracking-[0.24em] text-turuncu font-semibold">Aktif İl Sayısı</p>
+                  <p id="hotlineProvinceCount" class="font-display text-5xl font-bold text-slate-900 mt-4">0</p>
+                  <p class="text-sm text-slate-700/70 mt-2">Son ihbar gelen farklı il sayısı</p>
+                </div>
+              </div>
+
+              <div class="rounded-[2rem] bg-white border border-slate-200 p-6">
+                <div class="flex items-center justify-between gap-3 mb-4">
+                  <div>
+                    <p class="text-sm uppercase tracking-[0.24em] text-slate-500">Son İhbarlar</p>
+                    <h3 class="font-display text-xl font-semibold text-slate-900 mt-2">En yeni dört rapor</h3>
+                  </div>
+                  <span class="inline-flex items-center rounded-full bg-turuncu/10 text-turuncu text-xs font-semibold px-3 py-1">Canlı</span>
+                </div>
+                <div id="hotlineRecentList" class="space-y-4 max-h-[300px] overflow-y-auto scrollbar-thin pr-1"></div>
+              </div>
+            </div>
+
+            <aside class="space-y-4">
+              <div class="rounded-[2rem] bg-white border border-lacivert/10 p-6 shadow-soft">
+                <div class="flex items-center justify-between gap-3 mb-4">
+                  <div>
+                    <p class="text-sm uppercase tracking-[0.24em] text-turuncu font-semibold">İhbar Arşivi</p>
+                    <h3 class="font-display text-xl font-semibold text-lacivert mt-2">Arşivlenen Raporlar</h3>
+                  </div>
+                  <button id="hotlineArchiveToggle" class="inline-flex items-center rounded-full bg-slate-900/10 text-slate-900 px-3 py-2 text-xs font-semibold hover:bg-slate-900/15 transition-colors">Daralt</button>
+                </div>
+                <p class="text-sm text-slate-700/70 mb-4">Arşivlenen raporlar burada kalır, daha sonra detayını tekrar inceleyebilirsin. Ekip yönlendir seçeneğiyle gereken birime gönderildiğinde rapor arşive taşınır.</p>
+                <div id="hotlineArchiveContent" class="rounded-[1.5rem] bg-slate-50/80 border border-slate-200 p-4 overflow-hidden transition-all duration-300" style="max-height: 1000px;">
+                  <div class="flex items-center justify-between gap-3 mb-3 text-sm text-lacivert/70">
+                    <span>Arşiv Sayısı:</span>
+                    <span id="hotlineArchiveCount" class="font-semibold text-lacivert">0</span>
+                  </div>
+                  <div id="hotlineArchiveList" class="space-y-3 overflow-y-auto max-h-[250px] scrollbar-thin pr-1"></div>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <!-- CONTENT -->
+      <section class="grid grid-cols-1 xl:grid-cols-[1fr_340px] gap-6">
+        <!-- STORIES -->
+        <div>
+          <div id="storiesGrid" class="space-y-5"></div>
+
+          <div id="emptyState" class="hidden bg-white border border-slate-200 rounded-[2rem] p-10 text-center shadow-sm">
+            <div class="w-20 h-20 rounded-full bg-slate-900/10 flex items-center justify-center mx-auto mb-5">
+              <i data-lucide="inbox" class="w-9 h-9 text-slate-900"></i>
+            </div>
+            <h3 class="font-display text-3xl font-bold text-slate-950">Gösterilecek kayıt yok</h3>
+            <p class="text-slate-700/60 mt-3 max-w-md mx-auto">
+              Filtreyi değiştir veya yeni hikâye gelmesini bekle.
+            </p>
+          </div>
+        </div>
+
+        <!-- SIDE PANEL -->
+        <aside class="space-y-5">
+          <div class="bg-white border border-slate-200 rounded-[1.75rem] p-5 shadow-sm">
+            <div class="flex items-start justify-between gap-4 mb-4">
+              <div>
+                <h3 class="font-display text-xl font-bold text-slate-950">Hikaye Yönetimi</h3>
+                <p class="text-sm text-slate-700/70 mt-1">Onaylanmış hikâyeleri düzenle veya reddedilmiş hikâyeleri kontrol et, onayla ya da beklemeye al.</p>
+              </div>
+              <span class="inline-flex items-center rounded-full bg-turuncu/10 text-turuncu text-xs font-semibold px-3 py-1">Tek Blok</span>
+            </div>
+
+            <div class="space-y-4">
+              <div class="space-y-3">
+                <label class="block text-sm font-semibold text-slate-800">Onaylanmış Hikâye</label>
+                <select id="approvedEditSelect" class="w-full px-3 py-3 rounded-2xl border border-slate-200 bg-slate-50/60 outline-none focus:border-turuncu focus:ring-2 focus:ring-turuncu/20 text-sm">
+                  <option value="">Onaylanmış bir hikâye seç</option>
+                </select>
+                <textarea id="approvedEditText" rows="4" class="w-full px-3 py-3 rounded-2xl border border-slate-200 bg-slate-50/60 outline-none focus:border-turuncu focus:ring-2 focus:ring-turuncu/20 text-sm resize-none" placeholder="Sansürlü metni burada düzenle"></textarea>
+                <button id="approvedEditBtn" class="inline-flex items-center justify-center gap-2 w-full rounded-2xl bg-turuncu text-white px-4 py-3 font-semibold hover:bg-orange-600 transition-colors">
+                  <i data-lucide="save" class="w-4 h-4"></i>
+                  Kaydet
+                </button>
+              </div>
+
+              <div class="rounded-3xl border border-slate-200 bg-slate-50/70 p-4">
+                <div class="flex items-start justify-between gap-3 mb-3">
+                  <div>
+                    <p class="text-sm font-semibold text-slate-900">Geçici Reddedilenler</p>
+                    <p class="text-xs text-slate-700/60">15 dakika sonra otomatik silinir. Bu süre içinde tekrar onaylayabilirsin.</p>
+                  </div>
+                  <span class="inline-flex items-center rounded-full bg-slate-900/10 text-slate-900 text-[11px] uppercase tracking-[0.24em] font-semibold px-3 py-1">15 dk</span>
+                </div>
+
+                <div id="rejectedStoriesList" class="space-y-3 max-h-52 overflow-y-auto scrollbar-thin pr-1"></div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <button id="approvedRevertBtn" class="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white text-slate-700 px-4 py-3 text-sm font-semibold hover:border-turuncu hover:text-turuncu transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
+                  <i data-lucide="corner-up-left" class="w-4 h-4"></i>
+                  Beklemeye Al
+                </button>
+                <button id="approvedDeleteBtn" class="inline-flex items-center justify-center gap-2 rounded-2xl border border-rose-500 bg-rose-50 text-rose-700 px-4 py-3 text-sm font-semibold hover:bg-rose-100 transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
+                  <i data-lucide="trash" class="w-4 h-4"></i>
+                  Sil
+                </button>
+              </div>
+
+              <p id="approvedEditStatus" class="text-xs text-slate-700/60"></p>
+            </div>
+          </div>
+
+          <div class="bg-slate-950 text-white rounded-[2rem] p-6 shadow-sm">
+            <p class="font-display text-2xl font-bold leading-tight">
+              Önce güvenlik, sonra yayın.
+            </p>
+            <p class="text-slate-200 mt-3 text-sm leading-relaxed">
+              Bu panelin amacı içeriği hızla düzenlemek değil; güvenli yayın kararını kontrollü biçimde verebilmen.
+            </p>
+          </div>
+        </aside>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // Firebase config - mevcut sitendekiyle aynı
+    const firebaseConfig = {
+      apiKey: "AIzaSyCtMDW02uu76OhN4T4jjxlUnLAeDkjPd_g",
+      authDomain: "hikayede-kalmasin.firebaseapp.com",
+      projectId: "hikayede-kalmasin",
+      storageBucket: "hikayede-kalmasin.firebasestorage.app",
+      messagingSenderId: "478212134838",
+      appId: "1:478212134838:web:b5e8227808eb623bf39317",
+      databaseURL: "https://hikayede-kalmasin-default-rtdb.firebaseio.com"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const pendingRef = db.ref("pendingStories");
+    const approvedRef = db.ref("approvedStories");
+    const rejectedRef = db.ref("rejectedStories");
+    const hotlineReportsRef = db.ref("hotlineReports");
+
+    const storiesGrid = document.getElementById("storiesGrid");
+    const emptyState = document.getElementById("emptyState");
+    const searchInput = document.getElementById("searchInput");
+    const typeFilter = document.getElementById("typeFilter");
+    const anonymousFilterBtn = document.getElementById("anonymousFilterBtn");
+    const refreshBtn = document.getElementById("refreshBtn");
+
+    const pendingCountEl = document.getElementById("pendingCount");
+    const approvedCountEl = document.getElementById("approvedCount");
+    const rejectedCountEl = document.getElementById("rejectedCount");
+    const anonymousCountEl = document.getElementById("anonymousCount");
+    const approvedEditSelect = document.getElementById("approvedEditSelect");
+    const approvedEditText = document.getElementById("approvedEditText");
+    const approvedEditBtn = document.getElementById("approvedEditBtn");
+    const approvedRevertBtn = document.getElementById("approvedRevertBtn");
+    const approvedDeleteBtn = document.getElementById("approvedDeleteBtn");
+    const approvedEditStatus = document.getElementById("approvedEditStatus");
+    const rejectedStoriesListEl = document.getElementById("rejectedStoriesList");
+    const hotlineCityDetails = document.getElementById("hotlineCityDetails");
+    const hotlineArchiveCount = document.getElementById("hotlineArchiveCount");
+    const hotlineArchiveListEl = document.getElementById("hotlineArchiveList");
+    const hotlineArchiveContent = document.getElementById("hotlineArchiveContent");
+    const hotlineArchiveToggle = document.getElementById("hotlineArchiveToggle");
+
+    let pendingStories = [];
+    let approvedStories = [];
+    let rejectedStories = [];
+    let hotlineReports = [];
+    let anonymousOnly = false;
+    let hotlineArchiveExpanded = true;
+
+    function formatDate(ts) {
+      if (!ts) return "-";
+      return new Date(ts).toLocaleString("tr-TR", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    }
+
+    function escapeHtml(str = "") {
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function getTypeLabel(type) {
+      if (type === "victim") return "Bana Yapıldı";
+      if (type === "witness") return "Tanık Oldum";
+      if (type === "intervene") return "Ben Müdahale Ettim";
+      return "Belirsiz";
+    }
+
+    function getTypeColor(type) {
+      if (type === "victim") return "bg-rose-100 text-rose-700";
+      if (type === "witness") return "bg-blue-100 text-blue-700";
+      if (type === "intervene") return "bg-emerald-100 text-emerald-700";
+      return "bg-slate-100 text-slate-700";
+    }
+
+    function getHotlineCounts() {
+      return hotlineReports.reduce((acc, report) => {
+        if (report.archived) return acc;
+        if (!report.city) return acc;
+        acc[report.city] = (acc[report.city] || 0) + 1;
+        return acc;
+      }, {});
+    }
+
+    function updateHotlineMap() {
+      const counts = getHotlineCounts();
+      const totalCountEl = document.getElementById('hotlineTotalCount');
+      const provinceCountEl = document.getElementById('hotlineProvinceCount');
+      const recentListEl = document.getElementById('hotlineRecentList');
+      const summaryEl = document.getElementById('hotlineCityDetails');
+      const archiveCountEl = hotlineArchiveCount;
+      const archiveListEl = hotlineArchiveListEl;
+
+      const activeReports = hotlineReports.filter(report => !report.archived);
+      const archivedReports = hotlineReports.filter(report => report.archived);
+      const totalReports = activeReports.length;
+      const activeProvinceCount = Object.keys(counts).length;
+
+      if (totalCountEl) totalCountEl.textContent = totalReports;
+      if (provinceCountEl) provinceCountEl.textContent = activeProvinceCount;
+      if (archiveCountEl) archiveCountEl.textContent = archivedReports.length;
+
+      if (recentListEl) {
+        const sortedReports = activeReports.slice().sort((a, b) => b.createdAt - a.createdAt).slice(0, 4);
+        recentListEl.innerHTML = sortedReports.length
+          ? sortedReports.map(report => {
+              const details = report.description || report.extraDetails || 'Detay yok';
+              return `
+                <div class="rounded-[1.5rem] border border-lacivert/10 bg-zemin p-4">
+                  <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+                    <div>
+                      <p class="text-sm font-semibold text-lacivert">${escapeHtml(report.city || 'Bilinmeyen İl')}</p>
+                      <p class="text-xs text-lacivert/60">${escapeHtml(report.bullyingType || 'Tür belirtilmedi')} • ${escapeHtml(report.location || 'Konum belirtilmedi')}</p>
+                    </div>
+                    <span class="inline-flex items-center rounded-full bg-white/80 text-lacivert/70 px-3 py-1 text-[11px] uppercase tracking-[0.24em]">${report.isAnonymous ? 'Anonim' : 'Açık'}</span>
+                  </div>
+                  <div class="space-y-3 text-sm text-lacivert/80">
+                    <div>
+                      <p class="font-semibold text-lacivert">Açıklama</p>
+                      <p>${escapeHtml(details)}</p>
+                    </div>
+                    ${report.extraDetails ? `
+                      <div>
+                        <p class="font-semibold text-lacivert">Ek Bilgi</p>
+                        <p>${escapeHtml(report.extraDetails)}</p>
+                      </div>
+                    ` : ''}
+                    ${report.incidentAddress ? `
+                      <div>
+                        <p class="font-semibold text-lacivert">Adres</p>
+                        <p>${escapeHtml(report.incidentAddress)}</p>
+                      </div>
+                    ` : ''}
+                    <div>
+                      <p class="font-semibold text-lacivert">İletişim</p>
+                      <p>${report.isAnonymous ? 'Anonim olarak gönderildi' : escapeHtml(report.contactNumber || 'Numara yok')}</p>
+                    </div>
+                  </div>
+                  <div class="mt-4 flex flex-wrap gap-2">
+                    <button onclick="routeHotlineReport('${report.id || report.key}');" class="rounded-2xl bg-lacivert text-white px-3 py-2 text-xs font-semibold hover:bg-lacivert/90 transition-colors">Ekip Yönlendir</button>
+                  </div>
+                  <p class="text-[11px] text-lacivert/50 mt-4">${formatDate(report.createdAt)}</p>
+                </div>
+              `;
+            }).join('')
+          : '<p class="text-sm text-lacivert/70">Henüz yeni ihbar yok.</p>';
+      }
+
+      if (archiveListEl) {
+        archiveListEl.innerHTML = archivedReports.length
+          ? archivedReports.slice().sort((a, b) => b.createdAt - a.createdAt).map(report => `
+              <details class="rounded-2xl border border-slate-200 bg-white overflow-hidden">
+                <summary class="cursor-pointer p-4 flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <p class="text-sm font-semibold text-slate-900">${escapeHtml(report.city || 'Bilinmeyen İl')}</p>
+                    <p class="text-xs text-slate-500">${escapeHtml(report.bullyingType || 'Tür belirtilmedi')}</p>
+                  </div>
+                  <span class="inline-flex items-center rounded-full bg-slate-900/10 text-slate-900 text-[11px] uppercase tracking-[0.24em] px-3 py-1">${report.isAnonymous ? 'Anonim' : 'Açık'}</span>
+                </summary>
+                <div class="border-t border-slate-200 px-4 py-4 space-y-3 text-sm text-slate-700 leading-relaxed">
+                  <div>
+                    <p class="font-semibold text-slate-900">Konum</p>
+                    <p>${escapeHtml(report.location || 'Belirtilmemiş')}</p>
+                  </div>
+                  <div>
+                    <p class="font-semibold text-slate-900">Açıklama</p>
+                    <p>${escapeHtml(report.description || report.extraDetails || 'Detay yok')}</p>
+                  </div>
+                  ${report.extraDetails ? `
+                    <div>
+                      <p class="font-semibold text-slate-900">Ek Bilgi</p>
+                      <p>${escapeHtml(report.extraDetails)}</p>
+                    </div>
+                  ` : ''}
+                  ${report.incidentAddress ? `
+                    <div>
+                      <p class="font-semibold text-slate-900">Adres</p>
+                      <p>${escapeHtml(report.incidentAddress)}</p>
+                    </div>
+                  ` : ''}
+                  <div>
+                    <p class="font-semibold text-slate-900">İletişim</p>
+                    <p>${report.isAnonymous ? 'Anonim olarak gönderildi' : escapeHtml(report.contactNumber || 'Numara yok')}</p>
+                  </div>
+                  <div class="flex flex-wrap items-center justify-between gap-3 text-[11px] text-slate-500">
+                    <span>${formatDate(report.createdAt)}</span>
+                    <button onclick="routeHotlineReport('${report.id || report.key}');" class="rounded-full bg-slate-900/10 text-slate-900 px-3 py-1 text-xs font-semibold hover:bg-slate-900/15 transition-colors">Ekip Yönlendir</button>
+                  </div>
+                </div>
+              </details>
+            `).join('')
+          : '<p class="text-sm text-slate-700/70">Arşivde henüz kayıt yok.</p>';
+      }
+
+      if (summaryEl) {
+        const topProvinces = Object.entries(counts)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 3)
+          .map(([city, count]) => `${escapeHtml(city)} (${count})`)
+          .join(', ');
+
+        summaryEl.innerHTML = `
+          <div class="space-y-3">
+            <p class="text-sm text-lacivert/70">Yeni ihbarlar otomatik olarak kaydedildi.</p>
+            <p class="text-sm text-lacivert/80">Toplam ${totalReports} ihbar, ${activeProvinceCount} farklı ilden geliyor.</p>
+            <p class="text-sm text-lacivert/80">En aktif iller: ${topProvinces || 'Henüz yok'}.</p>
+          </div>
+        `;
+      }
+    }
+
+    function getActiveRejectedStories() {
+      const now = Date.now();
+      return rejectedStories
+        .filter(story => !story.expiresAt || story.expiresAt > now)
+        .sort((a, b) => (b.rejectedAt || 0) - (a.rejectedAt || 0));
+    }
+
+    function updateStats() {
+      pendingCountEl.textContent = pendingStories.length;
+      approvedCountEl.textContent = approvedStories.length;
+      rejectedCountEl.textContent = getActiveRejectedStories().length;
+      anonymousCountEl.textContent = pendingStories.filter(item => item.anonymous).length;
+    }
+
+    function renderRejectedStories() {
+      if (!rejectedStoriesListEl) return;
+      const active = getActiveRejectedStories();
+
+      if (!active.length) {
+        rejectedStoriesListEl.innerHTML = '<div class="rounded-2xl bg-zemin/70 p-4 text-sm text-lacivert/60">Şu an geçici reddedilmiş hikâye yok.</div>';
+        return;
+      }
+
+      rejectedStoriesListEl.innerHTML = active.map(story => {
+        const id = story.id || story.key || '';
+        const text = (story.sanitizedText || story.originalText || '').slice(0, 120).replace(/\n/g, ' ');
+        const remaining = Math.max(0, Math.ceil(((story.expiresAt || 0) - Date.now()) / 60000));
+        return `
+          <div class="rounded-2xl bg-zemin/70 border border-lacivert/10 p-3">
+            <div class="flex items-start justify-between gap-3 mb-3">
+              <span class="text-xs font-semibold text-lacivert">${getTypeLabel(story.storyType)}</span>
+              <span class="text-[11px] uppercase tracking-[0.24em] text-lacivert/60">${remaining} dk</span>
+            </div>
+            <p class="text-sm text-lacivert/80 leading-relaxed mb-3">${text}${(story.sanitizedText || story.originalText || '').length > 120 ? '…' : ''}</p>
+            <div class="flex gap-2">
+              <button onclick="approveRejectedStory('${id}')" class="flex-1 rounded-2xl bg-green-600 text-white text-xs font-semibold py-2 hover:bg-green-700 transition-colors">Onayla</button>
+              <button onclick="restoreRejectedStory('${id}')" class="flex-1 rounded-2xl border border-lacivert/10 bg-white text-lacivert text-xs font-semibold py-2 hover:border-turuncu hover:text-turuncu transition-colors">Beklemede</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function cleanupExpiredRejectedStories() {
+      const now = Date.now();
+      getActiveRejectedStories();
+      rejectedStories.forEach(story => {
+        if (story.expiresAt && story.expiresAt <= now) {
+          rejectedRef.child(story.id || story.key).remove().catch(() => {});
+        }
+      });
+    }
+
+    function updateApprovedEditOptions() {
+      if (!approvedEditSelect) return;
+      approvedEditSelect.innerHTML = '<option value="">Onaylanmış bir hikâye seç</option>';
+
+      const sorted = approvedStories.slice().sort((a, b) => (b.approvedAt || b.createdAt || 0) - (a.approvedAt || a.createdAt || 0));
+      sorted.forEach(story => {
+        const id = story.id || story.key || '';
+        const type = story.forumStoryType || story.storyType || '';
+        const label = `${getTypeLabel(type)} — ${((story.forumStoryText || story.sanitizedText || '').slice(0, 55)).replace(/\n/g, ' ')}${(story.forumStoryText || story.sanitizedText || '').length > 55 ? '…' : ''}`;
+        const option = document.createElement('option');
+        option.value = id;
+        option.textContent = label;
+        approvedEditSelect.appendChild(option);
+      });
+
+      if (!approvedEditSelect.value) {
+        approvedEditText.value = '';
+        approvedEditStatus.textContent = '';
+      }
+    }
+
+    function getApprovedStoryById(id) {
+      return approvedStories.find(story => (story.id || story.key) === id);
+    }
+
+    function handleApprovedEditSelection() {
+      const selectedId = approvedEditSelect.value;
+      const story = getApprovedStoryById(selectedId);
+      approvedEditText.value = story ? (story.forumStoryText || story.sanitizedText || '') : '';
+      approvedEditStatus.textContent = '';
+    }
+
+    async function saveApprovedEdit() {
+      const selectedId = approvedEditSelect.value;
+      if (!selectedId) {
+        approvedEditStatus.textContent = 'Lütfen önce bir hikâye seç.';
+        return;
+      }
+
+      const story = getApprovedStoryById(selectedId);
+      if (!story) {
+        approvedEditStatus.textContent = 'Seçilen hikâye bulunamadı.';
+        return;
+      }
+
+      const newText = approvedEditText.value.trim();
+      if (!newText) {
+        approvedEditStatus.textContent = 'Boş metin kaydedilemez.';
+        return;
+      }
+
+      approvedEditBtn.disabled = true;
+      approvedEditStatus.textContent = 'Kaydediliyor...';
+
+      try {
+        await approvedRef.child(selectedId).update({
+          forumStoryText: newText,
+          sanitizedText: newText,
+          updatedAt: Date.now()
+        });
+
+        approvedEditStatus.textContent = 'Değişiklik kaydedildi.';
+      } catch (error) {
+        console.error('Edit approved story error:', error);
+        approvedEditStatus.textContent = 'Kaydetme sırasında hata oluştu.';
+      } finally {
+        approvedEditBtn.disabled = false;
+      }
+    }
+
+    function getRejectedStoryById(id) {
+      return rejectedStories.find(story => (story.id || story.key) === id);
+    }
+
+    async function approveRejectedStory(id) {
+      const story = getRejectedStoryById(id);
+      if (!story) return;
+
+      const confirmed = confirm('Bu reddedilmiş hikâyeyi doğrudan onaylamak istediğine emin misin?');
+      if (!confirmed) return;
+
+      try {
+        await approvedRef.child(id).set({
+          id,
+          forumStoryType: story.forumStoryType || story.storyType,
+          forumStoryText: story.sanitizedText || story.originalText || '',
+          isAnonymous: !!story.anonymous,
+          originalText: story.originalText || '',
+          sanitizedText: story.sanitizedText || story.originalText || '',
+          createdAt: story.createdAt || Date.now(),
+          approvedAt: Date.now()
+        });
+
+        await rejectedRef.child(id).remove();
+      } catch (error) {
+        console.error('Approve rejected story error:', error);
+        alert('Onaylama sırasında hata oluştu.');
+      }
+    }
+
+    async function restoreRejectedStory(id) {
+      const story = getRejectedStoryById(id);
+      if (!story) return;
+
+      const confirmed = confirm('Bu reddedilmiş hikâyeyi tekrar beklemede statüsüne almak istediğine emin misin?');
+      if (!confirmed) return;
+
+      try {
+        await pendingRef.child(id).set({
+          ...story,
+          status: 'pending',
+          rejectedAt: null,
+          expiresAt: null,
+          movedBackAt: Date.now()
+        });
+
+        await rejectedRef.child(id).remove();
+      } catch (error) {
+        console.error('Restore rejected story error:', error);
+        alert('İşlem sırasında hata oluştu.');
+      }
+    }
+
+    async function routeHotlineReport(id) {
+      const report = hotlineReports.find(item => (item.id || item.key) === id);
+      if (!report) return;
+
+      const confirmed = confirm('Bu ihbarı ekibe yönlendirmek ve arşive taşımak istediğine emin misin?');
+      if (!confirmed) return;
+
+      try {
+        await hotlineReportsRef.child(id).update({
+          archived: true,
+          archivedAt: Date.now()
+        });
+      } catch (error) {
+        console.error('Route hotline report error:', error);
+        alert('İşlem sırasında hata oluştu.');
+      }
+    }
+
+    function updateApprovedEditControls() {
+      const enabled = !!approvedEditSelect && !!approvedEditSelect.value;
+      if (approvedEditBtn) approvedEditBtn.disabled = !enabled;
+      if (approvedRevertBtn) approvedRevertBtn.disabled = !enabled;
+      if (approvedDeleteBtn) approvedDeleteBtn.disabled = !enabled;
+    }
+
+    async function moveApprovedBackToPending() {
+      const selectedId = approvedEditSelect.value;
+      if (!selectedId) {
+        approvedEditStatus.textContent = 'Lütfen önce bir hikâye seç.';
+        return;
+      }
+
+      const story = getApprovedStoryById(selectedId);
+      if (!story) {
+        approvedEditStatus.textContent = 'Seçilen hikâye bulunamadı.';
+        return;
+      }
+
+      const confirmed = confirm('Bu hikâyeyi tekrar beklemede statüsüne almak istediğine emin misin?');
+      if (!confirmed) return;
+
+      approvedRevertBtn.disabled = true;
+      approvedEditStatus.textContent = 'İşlem yapılıyor...';
+
+      try {
+        await pendingRef.child(selectedId).set({
+          ...story,
+          status: 'pending',
+          createdAt: story.createdAt || Date.now(),
+          movedBackAt: Date.now()
+        });
+
+        await approvedRef.child(selectedId).remove();
+        approvedEditStatus.textContent = 'Hikâye tekrar beklemeye alındı.';
+        approvedEditText.value = '';
+        approvedEditSelect.value = '';
+        updateApprovedEditControls();
+      } catch (error) {
+        console.error('Move approved back error:', error);
+        approvedEditStatus.textContent = 'İşlem sırasında hata oluştu.';
+      } finally {
+        approvedRevertBtn.disabled = false;
+      }
+    }
+
+    async function deleteApprovedStory() {
+      const selectedId = approvedEditSelect.value;
+      if (!selectedId) {
+        approvedEditStatus.textContent = 'Lütfen önce bir hikâye seç.';
+        return;
+      }
+
+      const confirmed = confirm('Bu onaylanmış hikâyeyi tamamen silmek istediğine emin misin? Bu işlem geri alınamaz.');
+      if (!confirmed) return;
+
+      approvedDeleteBtn.disabled = true;
+      approvedEditStatus.textContent = 'Siliniyor...';
+
+      try {
+        await approvedRef.child(selectedId).remove();
+        approvedEditStatus.textContent = 'Hikâye silindi.';
+        approvedEditText.value = '';
+        approvedEditSelect.value = '';
+        updateApprovedEditControls();
+      } catch (error) {
+        console.error('Delete approved story error:', error);
+        approvedEditStatus.textContent = 'Silme sırasında hata oluştu.';
+      } finally {
+        approvedDeleteBtn.disabled = false;
+      }
+    }
+
+    if (approvedEditSelect) {
+      approvedEditSelect.addEventListener('change', event => {
+        handleApprovedEditSelection();
+        updateApprovedEditControls();
+      });
+    }
+
+    if (approvedEditBtn) {
+      approvedEditBtn.addEventListener('click', saveApprovedEdit);
+    }
+
+    if (approvedRevertBtn) {
+      approvedRevertBtn.addEventListener('click', moveApprovedBackToPending);
+    }
+
+    if (approvedDeleteBtn) {
+      approvedDeleteBtn.addEventListener('click', deleteApprovedStory);
+    }
+
+    if (hotlineArchiveToggle && hotlineArchiveContent) {
+      hotlineArchiveToggle.addEventListener('click', () => {
+        hotlineArchiveExpanded = !hotlineArchiveExpanded;
+        hotlineArchiveToggle.textContent = hotlineArchiveExpanded ? 'Daralt' : 'Genişlet';
+        hotlineArchiveContent.style.maxHeight = hotlineArchiveExpanded ? '1000px' : '14rem';
+      });
+    }
+
+    function getFilteredStories() {
+      const query = searchInput.value.trim().toLowerCase();
+      const selectedType = typeFilter.value;
+
+      return pendingStories.filter(story => {
+        const textBlock = `${story.originalText || ""} ${story.sanitizedText || ""}`.toLowerCase();
+
+        const matchesSearch = !query || textBlock.includes(query);
+        const matchesType = selectedType === "all" || story.storyType === selectedType;
+        const matchesAnonymous = !anonymousOnly || !!story.anonymous;
+
+        return matchesSearch && matchesType && matchesAnonymous;
+      }).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    }
+
+    function renderStories() {
+      const filtered = getFilteredStories();
+
+      if (!filtered.length) {
+        storiesGrid.innerHTML = "";
+        emptyState.classList.remove("hidden");
+        return;
+      }
+
+      emptyState.classList.add("hidden");
+
+      storiesGrid.innerHTML = filtered.map(story => {
+        const id = story.id || story.key || "";
+        const originalText = escapeHtml(story.originalText || "");
+        const sanitizedText = escapeHtml(story.sanitizedText || story.originalText || "");
+        const typeLabel = getTypeLabel(story.storyType);
+        const typeColor = getTypeColor(story.storyType);
+
+        return `
+          <article class="story-card bg-white border border-lacivert/8 rounded-[2rem] p-5 sm:p-6 shadow-soft">
+            <div class="flex flex-col lg:flex-row gap-5">
+              <div class="flex-1 min-w-0">
+                <div class="flex flex-wrap items-center gap-2 mb-4">
+                  <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${typeColor}">
+                    ${typeLabel}
+                  </span>
+                  <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-turuncu/10 text-turuncu">
+                    Beklemede
+                  </span>
+                  ${story.anonymous ? `
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-lacivert/8 text-lacivert">
+                      Anonim İşaretli
+                    </span>
+                  ` : ""}
+                  <span class="text-lacivert/45 text-xs ml-auto">
+                    ${formatDate(story.createdAt)}
+                  </span>
+                </div>
+
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                  <div class="rounded-2xl bg-zemin/70 border border-lacivert/8 p-4">
+                    <div class="flex items-center gap-2 mb-2">
+                      <i data-lucide="file-text" class="w-4 h-4 text-lacivert/60"></i>
+                      <p class="font-semibold text-sm">Orijinal Metin</p>
+                    </div>
+                    <p class="text-sm text-lacivert/75 leading-relaxed whitespace-pre-wrap">${originalText || "-"}</p>
+                  </div>
+
+                  <div class="rounded-2xl bg-turuncu/5 border border-turuncu/15 p-4">
+                    <div class="flex items-center gap-2 mb-2">
+                      <i data-lucide="shield" class="w-4 h-4 text-turuncu"></i>
+                      <p class="font-semibold text-sm">Sansürlü Metin</p>
+                    </div>
+                    <p class="text-sm text-lacivert/75 leading-relaxed whitespace-pre-wrap">${sanitizedText || "-"}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="w-full lg:w-[210px] flex lg:flex-col gap-3">
+                <button
+                  onclick="approveStory('${id}')"
+                  class="flex-1 lg:w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-green-600 text-white hover:bg-green-700 transition-colors font-semibold"
+                >
+                  <i data-lucide="check" class="w-4 h-4"></i>
+                  Onayla
+                </button>
+
+                <button
+                  onclick="rejectStory('${id}')"
+                  class="flex-1 lg:w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-rose-600 text-white hover:bg-rose-700 transition-colors font-semibold"
+                >
+                  <i data-lucide="x" class="w-4 h-4"></i>
+                  Reddet
+                </button>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join("");
+
+      lucide.createIcons();
+    }
+
+    async function approveStory(id) {
+      const story = pendingStories.find(item => (item.id || item.key) === id);
+      if (!story) return;
+
+      const confirmed = confirm("Bu hikâyeyi yayınlamak istediğine emin misin?");
+      if (!confirmed) return;
+
+      try {
+        await approvedRef.child(id).set({
+          id,
+          forumStoryType: story.storyType,
+          forumStoryText: story.sanitizedText || story.originalText || "",
+          isAnonymous: !!story.anonymous,
+          originalText: story.originalText || "",
+          sanitizedText: story.sanitizedText || story.originalText || "",
+          createdAt: story.createdAt || Date.now(),
+          approvedAt: Date.now()
+        });
+
+        await pendingRef.child(id).remove();
+      } catch (error) {
+        console.error("Approve error:", error);
+        alert("Onay sırasında hata oluştu.");
+      }
+    }
+
+    async function rejectStory(id) {
+      const story = pendingStories.find(item => (item.id || item.key) === id);
+      if (!story) return;
+
+      const confirmed = confirm("Bu hikâyeyi reddetmek istediğine emin misin?");
+      if (!confirmed) return;
+
+      try {
+        await rejectedRef.child(id).set({
+          ...story,
+          rejectedAt: Date.now(),
+          expiresAt: Date.now() + 15 * 60 * 1000,
+          status: 'rejected'
+        });
+
+        await pendingRef.child(id).remove();
+      } catch (error) {
+        console.error("Reject error:", error);
+        alert("Red sırasında hata oluştu.");
+      }
+    }
+
+    // global
+    window.approveStory = approveStory;
+    window.rejectStory = rejectStory;
+    window.approveRejectedStory = approveRejectedStory;
+    window.restoreRejectedStory = restoreRejectedStory;
+
+    function bindRealtimeListeners() {
+      pendingRef.on("value", snapshot => {
+        const data = snapshot.val() || {};
+        pendingStories = Object.entries(data).map(([key, value]) => ({
+          key,
+          id: value.id || key,
+          ...value
+        }));
+        updateStats();
+        renderStories();
+      });
+
+      approvedRef.on("value", snapshot => {
+        const data = snapshot.val() || {};
+        approvedStories = Object.values(data);
+        updateStats();
+        updateApprovedEditOptions();
+        updateApprovedEditControls();
+      });
+
+      rejectedRef.on("value", snapshot => {
+        const data = snapshot.val() || {};
+        rejectedStories = Object.values(data);
+        cleanupExpiredRejectedStories();
+        updateStats();
+        renderRejectedStories();
+      });
+
+      hotlineReportsRef.on("value", snapshot => {
+        const data = snapshot.val() || {};
+        hotlineReports = Object.entries(data).map(([key, value]) => ({
+          id: key,
+          ...value
+        }));
+        updateHotlineMap();
+      });
+    }
+
+    searchInput.addEventListener("input", renderStories);
+    typeFilter.addEventListener("change", renderStories);
+
+    anonymousFilterBtn.addEventListener("click", () => {
+      anonymousOnly = !anonymousOnly;
+      anonymousFilterBtn.classList.toggle("pill-active", anonymousOnly);
+      anonymousFilterBtn.textContent = anonymousOnly ? "Anonim Filtre Açık" : "Sadece Anonim";
+      renderStories();
+    });
+
+    refreshBtn.addEventListener("click", () => {
+      renderStories();
+    });
+
+    bindRealtimeListeners();
+    setInterval(cleanupExpiredRejectedStories, 60 * 1000);
+    lucide.createIcons();
+  </script>
+</body>
+</html>
