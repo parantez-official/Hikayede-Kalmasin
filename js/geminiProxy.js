@@ -45,7 +45,7 @@ export async function analyzeReport(userPrompt, mode = 'analyze') {
   }
 
   const payload = { prompt: userPrompt, mode };
-  const endpoint = `${BACKEND_URL}/api/analyze-report`;
+  const endpoint = `${BACKEND_URL}/api/analyze-report?cb=${Date.now()}`;
 
   try {
     const resp = await fetch(endpoint, {
