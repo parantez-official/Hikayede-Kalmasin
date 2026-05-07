@@ -1425,28 +1425,19 @@ reportForm.addEventListener('submit', async (e) => {
       })
     });
     
-    // Doğrudan Firebase ve AI işlemlerine geç
-    if (true) { 
-      let aiAnalysis = null;
-      try {
-        const { analyzeReport } = await import('./js/geminiProxy.js');
-        aiAnalysis = await analyzeReport(description, 'analyze');
-      } catch (aiErr) {
-        console.error("AI Analysis failed:", aiErr);
-      }
+    // Doğrudan Firebase'e aktar
+    const hotlineReportRef = db.ref('hotlineReports').push();
+    await hotlineReportRef.set({
+      ...reportData,
+      id: hotlineReportRef.key,
+      createdAt: Date.now(),
+      createdISO: new Date().toISOString(),
+      aiAnalysis: null // Şimdilik analizsiz aktar
+    });
 
-      const hotlineReportRef = db.ref('hotlineReports').push();
-      await hotlineReportRef.set({
-        ...reportData,
-        id: hotlineReportRef.key,
-        createdAt: Date.now(),
-        createdISO: new Date().toISOString(),
-        aiAnalysis: aiAnalysis
-      });
-
-      reportForm.classList.add('hidden');
-      successEl.classList.remove('hidden');
-      lucide.createIcons();
+    reportForm.classList.add('hidden');
+    successEl.classList.remove('hidden');
+    lucide.createIcons();
     } else {
       alert('Hata: Rapor gönderilemedi. Lütfen tekrar deneyin.');
       submitBtn.disabled = false;
