@@ -59,7 +59,12 @@ async function callGemini(userPrompt, apiKey, mode) {
 
   if (!response.ok) {
     const errText = await response.text();
-    throw new Error(`Google API Hatası: ${response.status}`);
+    let detail = "";
+    try {
+      const errJson = JSON.parse(errText);
+      detail = errJson.error?.message || errText;
+    } catch(e) { detail = errText; }
+    throw new Error(`Google API Hatası (${response.status}): ${detail}`);
   }
 
   const data = await response.json();
