@@ -1,0 +1,1859 @@
+<!doctype html>
+<html lang="tr" class="h-full">
+
+<head>
+  <link rel="icon" type="image/png" href="assets/img/logo.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PARANTEZ Admin Paneli</title>
+
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+
+  <script type="module">
+    import { analyzeReport } from './js/geminiProxy.js';
+
+    // Global wrapper to maintain compatibility with existing onclick handlers
+    window.analyzeReportWithGemini = async function(reportId, force = false) {
+      const report = (window.hotlineReports || []).find(r => (r.id || r.key) === reportId);
+      if (!report) return;
+
+      const text = `${report.description || ''} ${report.extraDetails || ''}`.trim();
+      if (!text) return;
+
+      try {
+        const btn = document.getElementById('ai-btn-' + reportId);
+        if (btn) {
+          btn.disabled = true;
+          btn.innerHTML = '<i data-lucide="loader-2" class="w-3 h-3 animate-spin"></i> Analiz Ediliyor...';
+          lucide.createIcons();
+        }
+
+        const aiResult = await analyzeReport(text);
+
+        await window.hotlineReportsRef.child(reportId).update({
+          aiAnalysis: aiResult,
+          aiAnalyzedAt: Date.now()
+        });
+
+      } catch (error) {
+        console.error("AI Analysis Hatası:", error);
+        const btn = document.getElementById('ai-btn-' + reportId);
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<i data-lucide="alert-triangle" class="w-3 h-3 text-red-500"></i> Hata. Tekrar Dene';
+          lucide.createIcons();
+        }
+      }
+    }
+  </script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            turuncu: '#F98513',
+            mavi: '#223382',
+            lacivert: '#111144',
+            zemin: '#F4F1EC',
+            kart: '#FBF9F5',
+          },
+          fontFamily: {
+            display: ['Oswald', 'sans-serif'],
+            body: ['DM Sans', 'sans-serif'],
+          },
+          boxShadow: {
+            soft: '0 10px 30px rgba(17,17,68,0.08)',
+            softlg: '0 18px 50px rgba(17,17,68,0.12)',
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      background: #F8FAFC;
+      color: #0F172A;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .glass {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .story-card {
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+    .story-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 14px 28px rgba(15, 23, 42, 0.08);
+    }
+
+    details>summary {
+      list-style: none;
+    }
+
+    details>summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details>summary {
+      padding-right: 0.5rem;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar-thumb {
+      background: rgba(15, 23, 42, 0.16);
+      border-radius: 999px;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .pill-active {
+      background: #0F172A;
+      color: white;
+      border-color: #0F172A;
+    }
+
+    /* MAP STYLES */
+    #svg-turkiye-haritasi {
+      width: 100%;
+      height: 100%;
+      filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.05));
+    }
+
+    #svg-turkiye-haritasi path {
+      fill: #e2e8f0;
+      /* slate-200 */
+      stroke: #ffffff;
+      stroke-width: 1.5;
+      transition: fill 0.3s ease, transform 0.3s ease;
+      cursor: pointer;
+      transform-origin: center;
+    }
+
+    #svg-turkiye-haritasi path:hover {
+      fill: #cbd5e1;
+      /* slate-300 */
+      stroke-width: 2;
+    }
+
+    #svg-turkiye-haritasi g.has-report path {
+      fill: #fcd34d;
+      /* yellow-300 / subtle orange */
+    }
+
+    #svg-turkiye-haritasi g.has-report:hover path {
+      fill: #f59e0b;
+    }
+
+    .map-dot-container {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .map-dot {
+      width: 12px;
+      height: 12px;
+      background-color: #ef4444;
+      /* red-500 */
+      border-radius: 50%;
+      box-shadow: 0 0 0 2px white;
+      position: absolute;
+    }
+
+    .map-dot.pulse {
+      animation: map-pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    .map-badge {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      background: #1e293b;
+      /* slate-800 */
+      color: white;
+      font-size: 10px;
+      font-weight: bold;
+      padding: 2px 6px;
+      border-radius: 9999px;
+      border: 2px solid white;
+    }
+
+    @keyframes map-pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+      }
+
+      50% {
+        opacity: .8;
+        transform: scale(1.5);
+        box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+      }
+    }
+
+    @keyframes city-pulse {
+      0% {
+        fill: #fecaca;
+      }
+
+      50% {
+        fill: #ef4444;
+      }
+
+      100% {
+        fill: #fecaca;
+      }
+    }
+
+    #svg-turkiye-haritasi g.city-pulsing path {
+      animation: city-pulse 1.5s infinite ease-in-out;
+      stroke: #7f1d1d !important;
+      stroke-width: 1.5px !important;
+    }
+
+    /* CHATBOT STYLES */
+    #ai-chatbot-panel {
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .chat-bubble-ai {
+      background: #f1f5f9;
+      color: #1e293b;
+      border-bottom-left-radius: 4px;
+    }
+
+    .chat-bubble-user {
+      background: #1e293b;
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+
+    #ai-chatbot-messages::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    #ai-chatbot-messages::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+
+<body class="h-full">
+
+  <div class="min-h-full">
+    <!-- TOP BAR -->
+    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-200 shadow-sm">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-2xl bg-slate-900 text-white flex items-center justify-center shadow-sm">
+            <i data-lucide="shield-check" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <p class="font-display text-2xl sm:text-3xl font-bold leading-none">PARANTEZ</p>
+            <p class="text-slate-500 text-sm">Admin Moderasyon Paneli</p>
+          </div>
+        </div>
+
+        <div class="hidden md:flex items-center gap-3">
+          <a href="./index.html"
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-slate-200 text-slate-700 hover:border-slate-900 hover:text-slate-900 transition-colors">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i>
+            Siteye Dön
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <!-- AI ALERT BANNER -->
+      <div id="aiCriticalBanner"
+        class="hidden mb-6 bg-red-500 text-white p-4 rounded-2xl shadow-softlg flex items-center gap-4">
+        <i data-lucide="alert-triangle" class="w-8 h-8 animate-pulse flex-shrink-0"></i>
+        <div>
+          <p class="font-bold text-lg">Kritik İhbar Uyarısı!</p>
+          <p class="text-sm text-red-100">Yapay zeka analizine göre acil müdahale gerektiren yüksek riskli ihbarlar
+            tespit edildi. Lütfen canlı akışı kontrol edin.</p>
+        </div>
+      </div>
+
+      <!-- HERO -->
+      <section class="mb-8">
+        <div class="rounded-3xl bg-white border border-slate-200 p-6 sm:p-8 shadow-sm">
+          <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+            <div class="max-w-2xl">
+              <p class="uppercase tracking-[0.24em] text-slate-500 text-sm font-semibold">Moderasyon</p>
+              <h1 class="mt-3 text-3xl sm:text-4xl font-display font-bold text-slate-950">Bekleyen Hikâyeler</h1>
+              <p class="mt-3 text-slate-600 leading-relaxed">Kullanıcı gönderilerini burada takip et, gerekli gördüğün
+                metinleri kontrol ederek hızlıca onayla veya reddet.</p>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full lg:w-auto">
+              <div class="rounded-3xl bg-slate-50 border border-slate-200 p-4">
+                <p class="text-slate-500 text-xs uppercase tracking-wider">Bekleyen</p>
+                <p id="pendingCount" class="font-display text-3xl font-bold mt-2 text-slate-950">0</p>
+              </div>
+              <div class="rounded-3xl bg-slate-50 border border-slate-200 p-4">
+                <p class="text-slate-500 text-xs uppercase tracking-wider">Onaylanan</p>
+                <p id="approvedCount" class="font-display text-3xl font-bold mt-2 text-slate-950">0</p>
+              </div>
+              <div class="rounded-3xl bg-slate-50 border border-slate-200 p-4">
+                <p class="text-slate-500 text-xs uppercase tracking-wider">Reddedilen</p>
+                <p id="rejectedCount" class="font-display text-3xl font-bold mt-2 text-slate-950">0</p>
+              </div>
+              <div class="rounded-3xl bg-slate-50 border border-slate-200 p-4">
+                <p class="text-slate-500 text-xs uppercase tracking-wider">Anonim</p>
+                <p id="anonymousCount" class="font-display text-3xl font-bold mt-2 text-slate-950">0</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FILTER BAR -->
+      <section class="mb-6">
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-4 sm:p-5">
+          <div class="grid grid-cols-1 lg:grid-cols-[1.4fr_.9fr_.9fr_auto] gap-4 items-center">
+            <div class="relative">
+              <i data-lucide="search" class="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+              <input id="searchInput" type="text" placeholder="Metin içinde ara..."
+                class="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-200 bg-slate-50 outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-200">
+            </div>
+
+            <select id="typeFilter"
+              class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-slate-50 outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-200">
+              <option value="all">Tüm Türler</option>
+              <option value="victim">Bana Yapıldı</option>
+              <option value="witness">Tanık Oldum</option>
+              <option value="intervene">Ben Müdahale Ettim</option>
+            </select>
+
+            <button id="anonymousFilterBtn"
+              class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-slate-50 text-slate-700 hover:border-slate-900 hover:text-slate-900 transition-colors">
+              Sadece Anonim
+            </button>
+
+            <button id="refreshBtn"
+              class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-slate-900 text-white hover:bg-slate-800 transition-colors">
+              <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+              Yenile
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="mb-6">
+        <div class="bg-white rounded-[2rem] border border-lacivert/8 shadow-soft p-6">
+          <div class="grid gap-6 lg:grid-cols-[1fr_360px]">
+            <div class="space-y-6">
+              <div>
+                <p class="text-sm uppercase tracking-[0.24em] text-turuncu font-semibold">Anında Bildir</p>
+                <h2 class="font-display text-3xl font-bold">İhbar Haritası</h2>
+                <p class="mt-3 text-lacivert/70">Yeni ihbarlar geldiğinde harita üzerinde anlık olarak konumlarını takip
+                  edebilirsin.</p>
+              </div>
+
+              <div class="grid gap-4 sm:grid-cols-2">
+                <div class="rounded-[2rem] bg-slate-50/80 border border-slate-200 p-6">
+                  <p class="text-sm uppercase tracking-[0.24em] text-turuncu font-semibold">Toplam İhbar</p>
+                  <p id="hotlineTotalCount" class="font-display text-5xl font-bold text-slate-900 mt-4">0</p>
+                  <p class="text-sm text-slate-700/70 mt-2">En son raporlanan ihbar sayısı</p>
+                </div>
+                <div class="rounded-[2rem] bg-slate-50/80 border border-slate-200 p-6">
+                  <p class="text-sm uppercase tracking-[0.24em] text-turuncu font-semibold">Aktif İl Sayısı</p>
+                  <p id="hotlineProvinceCount" class="font-display text-5xl font-bold text-slate-900 mt-4">0</p>
+                  <p class="text-sm text-slate-700/70 mt-2">Son ihbar gelen farklı il sayısı</p>
+                </div>
+              </div>
+
+              <!-- MAP CONTAINER -->
+              <div class="rounded-[2rem] bg-slate-50 border border-slate-200 p-2 sm:p-6 relative">
+                <div id="map-container" class="relative w-full aspect-[2/1] overflow-visible">
+                  <!-- SVG inject edilecek -->
+                </div>
+                <!-- Map Info Modal -->
+                <div id="map-info-modal"
+                  class="hidden absolute top-6 right-6 z-20 bg-white/95 backdrop-blur-md border border-slate-200 p-5 rounded-3xl shadow-softlg w-72 transition-opacity">
+                  <button id="close-map-modal" class="absolute top-4 right-4 text-slate-400 hover:text-slate-900"><i
+                      data-lucide="x" class="w-4 h-4"></i></button>
+                  <p class="text-xs uppercase tracking-[0.24em] text-turuncu font-semibold mb-1" id="modal-city-name">
+                    Şehir</p>
+                  <h4 class="font-display text-2xl font-bold text-slate-900 mb-3" id="modal-city-count">0 İhbar</h4>
+                  <div id="modal-reports-list" class="space-y-3 max-h-60 overflow-y-auto scrollbar-thin pr-2">
+                    <!-- Report details go here -->
+                  </div>
+                </div>
+              </div>
+
+              <div class="rounded-[2rem] bg-white border border-slate-200 p-6">
+                <div class="flex items-center justify-between gap-3 mb-4">
+                  <div>
+                    <p class="text-sm uppercase tracking-[0.24em] text-slate-500">Canlı Akış</p>
+                    <h3 class="font-display text-xl font-semibold text-slate-900 mt-2">Son İhbarlar</h3>
+                  </div>
+                  <span
+                    class="inline-flex items-center rounded-full bg-turuncu/10 text-turuncu text-xs font-semibold px-3 py-1">Canlı</span>
+                </div>
+                <div id="hotlineRecentList" class="space-y-4 max-h-[300px] overflow-y-auto scrollbar-thin pr-1"></div>
+              </div>
+            </div>
+
+            <aside class="space-y-4">
+              <div class="rounded-[2rem] bg-white border border-lacivert/10 p-6 shadow-soft">
+                <div class="flex items-center justify-between gap-3 mb-4">
+                  <div>
+                    <p class="text-sm uppercase tracking-[0.24em] text-turuncu font-semibold">İhbar Arşivi</p>
+                    <h3 class="font-display text-xl font-semibold text-lacivert mt-2">Arşivlenen Raporlar</h3>
+                  </div>
+                  <button id="hotlineArchiveToggle"
+                    class="inline-flex items-center rounded-full bg-slate-900/10 text-slate-900 px-3 py-2 text-xs font-semibold hover:bg-slate-900/15 transition-colors">Daralt</button>
+                </div>
+                <p class="text-sm text-slate-700/70 mb-4">Arşivlenen raporlar burada kalır, daha sonra detayını tekrar
+                  inceleyebilirsin. Ekip yönlendir seçeneğiyle gereken birime gönderildiğinde rapor arşive taşınır.</p>
+                <div id="hotlineArchiveContent"
+                  class="rounded-[1.5rem] bg-slate-50/80 border border-slate-200 p-4 overflow-hidden transition-all duration-300"
+                  style="max-height: 1000px;">
+                  <div class="flex items-center justify-between gap-3 mb-3 text-sm text-lacivert/70">
+                    <span>Arşiv Sayısı:</span>
+                    <span id="hotlineArchiveCount" class="font-semibold text-lacivert">0</span>
+                  </div>
+                  <div id="hotlineArchiveList" class="space-y-3 overflow-y-auto max-h-[250px] scrollbar-thin pr-1">
+                  </div>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <!-- CONTENT -->
+      <section class="grid grid-cols-1 xl:grid-cols-[1fr_340px] gap-6">
+        <!-- STORIES -->
+        <div>
+          <div id="storiesGrid" class="space-y-5"></div>
+
+          <div id="emptyState"
+            class="hidden bg-white border border-slate-200 rounded-[2rem] p-10 text-center shadow-sm">
+            <div class="w-20 h-20 rounded-full bg-slate-900/10 flex items-center justify-center mx-auto mb-5">
+              <i data-lucide="inbox" class="w-9 h-9 text-slate-900"></i>
+            </div>
+            <h3 class="font-display text-3xl font-bold text-slate-950">Gösterilecek kayıt yok</h3>
+            <p class="text-slate-700/60 mt-3 max-w-md mx-auto">
+              Filtreyi değiştir veya yeni hikâye gelmesini bekle.
+            </p>
+          </div>
+        </div>
+
+        <!-- SIDE PANEL -->
+        <aside class="space-y-5">
+          <div class="bg-white border border-slate-200 rounded-[1.75rem] p-5 shadow-sm">
+            <div class="flex items-start justify-between gap-4 mb-4">
+              <div>
+                <h3 class="font-display text-xl font-bold text-slate-950">Hikaye Yönetimi</h3>
+                <p class="text-sm text-slate-700/70 mt-1">Onaylanmış hikâyeleri düzenle veya reddedilmiş hikâyeleri
+                  kontrol et, onayla ya da beklemeye al.</p>
+              </div>
+              <span
+                class="inline-flex items-center rounded-full bg-turuncu/10 text-turuncu text-xs font-semibold px-3 py-1">Tek
+                Blok</span>
+            </div>
+
+            <div class="space-y-4">
+              <div class="space-y-3">
+                <label class="block text-sm font-semibold text-slate-800">Onaylanmış Hikâye</label>
+                <select id="approvedEditSelect"
+                  class="w-full px-3 py-3 rounded-2xl border border-slate-200 bg-slate-50/60 outline-none focus:border-turuncu focus:ring-2 focus:ring-turuncu/20 text-sm">
+                  <option value="">Onaylanmış bir hikâye seç</option>
+                </select>
+                <textarea id="approvedEditText" rows="4"
+                  class="w-full px-3 py-3 rounded-2xl border border-slate-200 bg-slate-50/60 outline-none focus:border-turuncu focus:ring-2 focus:ring-turuncu/20 text-sm resize-none"
+                  placeholder="Sansürlü metni burada düzenle"></textarea>
+                <button id="approvedEditBtn"
+                  class="inline-flex items-center justify-center gap-2 w-full rounded-2xl bg-turuncu text-white px-4 py-3 font-semibold hover:bg-orange-600 transition-colors">
+                  <i data-lucide="save" class="w-4 h-4"></i>
+                  Kaydet
+                </button>
+              </div>
+
+              <div class="rounded-3xl border border-slate-200 bg-slate-50/70 p-4">
+                <div class="flex items-start justify-between gap-3 mb-3">
+                  <div>
+                    <p class="text-sm font-semibold text-slate-900">Geçici Reddedilenler</p>
+                    <p class="text-xs text-slate-700/60">15 dakika sonra otomatik silinir. Bu süre içinde tekrar
+                      onaylayabilirsin.</p>
+                  </div>
+                  <span
+                    class="inline-flex items-center rounded-full bg-slate-900/10 text-slate-900 text-[11px] uppercase tracking-[0.24em] font-semibold px-3 py-1">15
+                    dk</span>
+                </div>
+
+                <div id="rejectedStoriesList" class="space-y-3 max-h-52 overflow-y-auto scrollbar-thin pr-1"></div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <button id="approvedRevertBtn"
+                  class="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white text-slate-700 px-4 py-3 text-sm font-semibold hover:border-turuncu hover:text-turuncu transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
+                  <i data-lucide="corner-up-left" class="w-4 h-4"></i>
+                  Beklemeye Al
+                </button>
+                <button id="approvedDeleteBtn"
+                  class="inline-flex items-center justify-center gap-2 rounded-2xl border border-rose-500 bg-rose-50 text-rose-700 px-4 py-3 text-sm font-semibold hover:bg-rose-100 transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
+                  <i data-lucide="trash" class="w-4 h-4"></i>
+                  Sil
+                </button>
+              </div>
+
+              <p id="approvedEditStatus" class="text-xs text-slate-700/60"></p>
+            </div>
+          </div>
+
+          <div class="bg-slate-950 text-white rounded-[2rem] p-6 shadow-sm">
+            <p class="font-display text-2xl font-bold leading-tight">
+              Önce güvenlik, sonra yayın.
+            </p>
+            <p class="text-slate-200 mt-3 text-sm leading-relaxed">
+              Bu panelin amacı içeriği hızla düzenlemek değil; güvenli yayın kararını kontrollü biçimde verebilmen.
+            </p>
+          </div>
+        </aside>
+      </section>
+    </main>
+  </div>
+
+  <script src="harita.js"></script>
+  <script>
+    // Firebase config - mevcut sitendekiyle aynı
+    const firebaseConfig = {
+      apiKey: "AIzaSyCtMDW02uu76OhN4T4jjxlUnLAeDkjPd_g",
+      authDomain: "hikayede-kalmasin.firebaseapp.com",
+      projectId: "hikayede-kalmasin",
+      storageBucket: "hikayede-kalmasin.firebasestorage.app",
+      messagingSenderId: "478212134838",
+      appId: "1:478212134838:web:b5e8227808eb623bf39317",
+      databaseURL: "https://hikayede-kalmasin-default-rtdb.firebaseio.com",
+      measurementId: "G-RLBYJV143E"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const pendingRef = db.ref("pendingStories");
+    const approvedRef = db.ref("approvedStories");
+    const rejectedRef = db.ref("rejectedStories");
+    const hotlineReportsRef = db.ref("hotlineReports");
+
+    const storiesGrid = document.getElementById("storiesGrid");
+    const emptyState = document.getElementById("emptyState");
+    const searchInput = document.getElementById("searchInput");
+    const typeFilter = document.getElementById("typeFilter");
+    const anonymousFilterBtn = document.getElementById("anonymousFilterBtn");
+    const refreshBtn = document.getElementById("refreshBtn");
+
+    const pendingCountEl = document.getElementById("pendingCount");
+    const approvedCountEl = document.getElementById("approvedCount");
+    const rejectedCountEl = document.getElementById("rejectedCount");
+    const anonymousCountEl = document.getElementById("anonymousCount");
+    const approvedEditSelect = document.getElementById("approvedEditSelect");
+    const approvedEditText = document.getElementById("approvedEditText");
+    const approvedEditBtn = document.getElementById("approvedEditBtn");
+    const approvedRevertBtn = document.getElementById("approvedRevertBtn");
+    const approvedDeleteBtn = document.getElementById("approvedDeleteBtn");
+    const approvedEditStatus = document.getElementById("approvedEditStatus");
+    const rejectedStoriesListEl = document.getElementById("rejectedStoriesList");
+    const hotlineCityDetails = document.getElementById("hotlineCityDetails");
+    const hotlineArchiveCount = document.getElementById("hotlineArchiveCount");
+    const hotlineArchiveListEl = document.getElementById("hotlineArchiveList");
+    const hotlineArchiveContent = document.getElementById("hotlineArchiveContent");
+    const hotlineArchiveToggle = document.getElementById("hotlineArchiveToggle");
+
+    let pendingStories = [];
+    let approvedStories = [];
+    let rejectedStories = [];
+    let hotlineReports = [];
+    let anonymousOnly = false;
+    let hotlineArchiveExpanded = true;
+
+    function formatDate(ts) {
+      if (!ts) return "-";
+      return new Date(ts).toLocaleString("tr-TR", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    }
+
+    function escapeHtml(str = "") {
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function getTypeLabel(type) {
+      if (type === "victim") return "Bana Yapıldı";
+      if (type === "witness") return "Tanık Oldum";
+      if (type === "intervene") return "Ben Müdahale Ettim";
+      return "Belirsiz";
+    }
+
+    function getTypeColor(type) {
+      if (type === "victim") return "bg-rose-100 text-rose-700";
+      if (type === "witness") return "bg-blue-100 text-blue-700";
+      if (type === "intervene") return "bg-emerald-100 text-emerald-700";
+      return "bg-slate-100 text-slate-700";
+    }
+
+    function getHotlineCounts() {
+      return hotlineReports.reduce((acc, report) => {
+        if (report.archived) return acc;
+        if (!report.city) return acc;
+        acc[report.city] = (acc[report.city] || 0) + 1;
+        return acc;
+      }, {});
+    }
+
+    function updateHotlineMap() {
+      const counts = getHotlineCounts();
+      const totalCountEl = document.getElementById('hotlineTotalCount');
+      const provinceCountEl = document.getElementById('hotlineProvinceCount');
+      const recentListEl = document.getElementById('hotlineRecentList');
+      const summaryEl = document.getElementById('hotlineCityDetails');
+      const archiveCountEl = hotlineArchiveCount;
+      const archiveListEl = hotlineArchiveListEl;
+
+      const activeReports = hotlineReports.filter(report => !report.archived);
+      const archivedReports = hotlineReports.filter(report => report.archived);
+      const totalReports = activeReports.length;
+      const activeProvinceCount = Object.keys(counts).length;
+
+      if (totalCountEl) totalCountEl.textContent = totalReports;
+      if (provinceCountEl) provinceCountEl.textContent = activeProvinceCount;
+      if (archiveCountEl) archiveCountEl.textContent = archivedReports.length;
+
+      // Update Map Markers
+      if (typeof refreshMapMarkers === 'function') {
+        refreshMapMarkers();
+      }
+
+      if (recentListEl) {
+        const sortedReports = activeReports.slice().sort((a, b) => b.createdAt - a.createdAt).slice(0, 4);
+
+        const hasCritical = activeReports.some(r => r.aiAnalysis && (r.aiAnalysis.is_emergency || r.aiAnalysis.severity === 'critical' || r.aiAnalysis.importance === 'critical' || r.aiAnalysis.severity === 'high' || r.aiAnalysis.importance === 'high'));
+        const banner = document.getElementById('aiCriticalBanner');
+        if (banner) {
+          if (hasCritical) banner.classList.remove('hidden');
+          else banner.classList.add('hidden');
+        }
+
+        recentListEl.innerHTML = sortedReports.length
+          ? sortedReports.map(report => {
+            const details = report.description || report.extraDetails || 'Detay yok';
+            const ai = report.aiAnalysis;
+
+            let aiHtml = '';
+            if (ai) {
+              const severity = ai.severity || ai.importance || 'medium';
+              const urgency = ai.is_emergency ? 'ACİL' : (ai.urgency || 'Normal');
+              
+              let importanceColor = 'bg-slate-100 text-slate-700 border-slate-200';
+              if (severity === 'low') importanceColor = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+              if (severity === 'medium') importanceColor = 'bg-yellow-50 text-yellow-700 border-yellow-200';
+              if (severity === 'high') importanceColor = 'bg-orange-50 text-orange-700 border-orange-200';
+              if (severity === 'critical' || ai.is_emergency) importanceColor = 'bg-red-50 text-red-700 border-red-200 shadow-sm border-2';
+
+              const category = ai.category || ai.riskType || 'Bilinmiyor';
+              const recAction = ai.recommended_action || ai.recommendedAction || 'Moderasyon gerekli';
+
+              aiHtml = `
+                  <div class="mt-4 p-4 rounded-xl border ${importanceColor}">
+                    <div class="flex items-center justify-between mb-2">
+                       <div class="flex items-center gap-2">
+                          <i data-lucide="sparkles" class="w-4 h-4"></i>
+                          <span class="font-semibold text-sm">AI Ön Değerlendirmesi</span>
+                       </div>
+                       <button id="ai-btn-${report.id || report.key}" onclick="analyzeReportWithGemini('${report.id || report.key}', true)" class="text-[10px] underline opacity-70 hover:opacity-100 flex items-center gap-1">
+                          <i data-lucide="refresh-cw" class="w-3 h-3"></i> Yenile
+                       </button>
+                    </div>
+                    <p class="text-xs mb-3 italic opacity-90">${escapeHtml(ai.summary)}</p>
+                    <div class="grid grid-cols-2 gap-2 text-[11px] mb-3">
+                       <div><span class="font-semibold opacity-70">Önem:</span> <span class="uppercase font-bold">${escapeHtml(severity)}</span> ${ai.risk_score ? `(${ai.risk_score})` : ''}</div>
+                       <div><span class="font-semibold opacity-70">Durum:</span> <span class="uppercase ${ai.is_emergency ? 'text-red-600 font-bold' : ''}">${escapeHtml(urgency)}</span></div>
+                       <div class="col-span-2"><span class="font-semibold opacity-70">Kategori:</span> <span class="font-bold">${escapeHtml(category)}</span></div>
+                       <div class="col-span-2"><span class="font-semibold opacity-70">Öneri:</span> ${escapeHtml(recAction)}</div>
+                    </div>
+                    ${ai.admin_note ? `<p class="mt-2 pt-2 border-t border-slate-200/50 text-[10px] italic text-slate-600"><span class="font-bold">Not:</span> ${escapeHtml(ai.admin_note)}</p>` : ''}
+                  </div>
+                `;
+            } else {
+              aiHtml = `
+                  <div class="mt-4 p-4 rounded-xl border border-dashed border-slate-300 bg-slate-50/50 flex flex-col items-center justify-center text-center">
+                    <p class="text-[11px] text-slate-500 mb-2">Bu ihbar henüz yapay zeka ile analiz edilmedi.</p>
+                    <button id="ai-btn-${report.id || report.key}" onclick="analyzeReportWithGemini('${report.id || report.key}')" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-sm transition-colors">
+                      <i data-lucide="sparkles" class="w-3 h-3 text-turuncu"></i>
+                      AI ile Analiz Et
+                    </button>
+                  </div>
+                `;
+              setTimeout(() => analyzeReportWithGemini(report.id || report.key), 500);
+            }
+
+            return `
+                <div class="rounded-[1.5rem] border border-lacivert/10 bg-zemin p-4">
+                  <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+                    <div>
+                      <p class="text-sm font-semibold text-lacivert">${escapeHtml(report.city || 'Bilinmeyen İl')}</p>
+                      <p class="text-xs text-lacivert/60">${escapeHtml(report.bullyingType || 'Tür belirtilmedi')} • ${escapeHtml(report.location || 'Konum belirtilmedi')}</p>
+                    </div>
+                    <span class="inline-flex items-center rounded-full bg-white/80 text-lacivert/70 px-3 py-1 text-[11px] uppercase tracking-[0.24em]">${report.isAnonymous ? 'Anonim' : 'Açık'}</span>
+                  </div>
+                  <div class="space-y-3 text-sm text-lacivert/80">
+                    <div>
+                      <p class="font-semibold text-lacivert">Açıklama</p>
+                      <p>${escapeHtml(details)}</p>
+                    </div>
+                    ${report.extraDetails ? `
+                      <div>
+                        <p class="font-semibold text-lacivert">Ek Bilgi</p>
+                        <p>${escapeHtml(report.extraDetails)}</p>
+                      </div>
+                    ` : ''}
+                    ${report.incidentAddress ? `
+                      <div>
+                        <p class="font-semibold text-lacivert">Adres</p>
+                        <p>${escapeHtml(report.incidentAddress)}</p>
+                      </div>
+                    ` : ''}
+                    <div>
+                      <p class="font-semibold text-lacivert">İletişim</p>
+                      <p>${report.isAnonymous ? 'Anonim olarak gönderildi' : escapeHtml(report.contactNumber || 'Numara yok')}</p>
+                    </div>
+                  </div>
+                  ${aiHtml}
+                  <div class="mt-4 flex flex-wrap items-center justify-between gap-2">
+                    <div class="flex items-center gap-2">
+                      <p class="text-[11px] text-lacivert/50">${formatDate(report.createdAt)}</p>
+                      <button onclick="openAIChat('${report.id || report.key}')" class="flex items-center gap-1 text-[11px] font-semibold text-turuncu hover:text-turuncu/80 transition-colors">
+                        <i data-lucide="message-square" class="w-3 h-3"></i>
+                        Asistanla Konuş
+                      </button>
+                    </div>
+                    <button onclick="routeHotlineReport('${report.id || report.key}');" class="rounded-2xl bg-lacivert text-white px-3 py-2 text-xs font-semibold hover:bg-lacivert/90 transition-colors">Ekip Yönlendir</button>
+                  </div>
+                </div>
+              `;
+          }).join('')
+          : '<p class="text-sm text-lacivert/70">Henüz yeni ihbar yok.</p>';
+      }
+
+      if (archiveListEl) {
+        archiveListEl.innerHTML = archivedReports.length
+          ? archivedReports.slice().sort((a, b) => b.createdAt - a.createdAt).map(report => `
+              <details class="rounded-2xl border border-slate-200 bg-white overflow-hidden">
+                <summary class="cursor-pointer p-4 flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <p class="text-sm font-semibold text-slate-900">${escapeHtml(report.city || 'Bilinmeyen İl')}</p>
+                    <p class="text-xs text-slate-500">${escapeHtml(report.bullyingType || 'Tür belirtilmedi')}</p>
+                  </div>
+                  <span class="inline-flex items-center rounded-full bg-slate-900/10 text-slate-900 text-[11px] uppercase tracking-[0.24em] px-3 py-1">${report.isAnonymous ? 'Anonim' : 'Açık'}</span>
+                </summary>
+                <div class="border-t border-slate-200 px-4 py-4 space-y-3 text-sm text-slate-700 leading-relaxed">
+                  <div>
+                    <p class="font-semibold text-slate-900">Konum</p>
+                    <p>${escapeHtml(report.location || 'Belirtilmemiş')}</p>
+                  </div>
+                  <div>
+                    <p class="font-semibold text-slate-900">Açıklama</p>
+                    <p>${escapeHtml(report.description || report.extraDetails || 'Detay yok')}</p>
+                  </div>
+                  ${report.extraDetails ? `
+                    <div>
+                      <p class="font-semibold text-slate-900">Ek Bilgi</p>
+                      <p>${escapeHtml(report.extraDetails)}</p>
+                    </div>
+                  ` : ''}
+                  ${report.incidentAddress ? `
+                    <div>
+                      <p class="font-semibold text-slate-900">Adres</p>
+                      <p>${escapeHtml(report.incidentAddress)}</p>
+                    </div>
+                  ` : ''}
+                  <div>
+                    <p class="font-semibold text-slate-900">İletişim</p>
+                    <p>${report.isAnonymous ? 'Anonim olarak gönderildi' : escapeHtml(report.contactNumber || 'Numara yok')}</p>
+                  </div>
+                  <div class="flex flex-wrap items-center justify-between gap-3 text-[11px] text-slate-500">
+                    <span>${formatDate(report.createdAt)}</span>
+                    <button onclick="routeHotlineReport('${report.id || report.key}');" class="rounded-full bg-slate-900/10 text-slate-900 px-3 py-1 text-xs font-semibold hover:bg-slate-900/15 transition-colors">Ekip Yönlendir</button>
+                  </div>
+                </div>
+              </details>
+            `).join('')
+          : '<p class="text-sm text-slate-700/70">Arşivde henüz kayıt yok.</p>';
+      }
+
+      if (summaryEl) {
+        const topProvinces = Object.entries(counts)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 3)
+          .map(([city, count]) => `${escapeHtml(city)} (${count})`)
+          .join(', ');
+
+        summaryEl.innerHTML = `
+          <div class="space-y-3">
+            <p class="text-sm text-lacivert/70">Yeni ihbarlar otomatik olarak kaydedildi.</p>
+            <p class="text-sm text-lacivert/80">Toplam ${totalReports} ihbar, ${activeProvinceCount} farklı ilden geliyor.</p>
+            <p class="text-sm text-lacivert/80">En aktif iller: ${topProvinces || 'Henüz yok'}.</p>
+          </div>
+        `;
+      }
+
+      lucide.createIcons();
+    }
+
+    function getActiveRejectedStories() {
+      const now = Date.now();
+      return rejectedStories
+        .filter(story => !story.expiresAt || story.expiresAt > now)
+        .sort((a, b) => (b.rejectedAt || 0) - (a.rejectedAt || 0));
+    }
+
+    function updateStats() {
+      pendingCountEl.textContent = pendingStories.length;
+      approvedCountEl.textContent = approvedStories.length;
+      rejectedCountEl.textContent = getActiveRejectedStories().length;
+      anonymousCountEl.textContent = pendingStories.filter(item => item.anonymous).length;
+    }
+
+    function renderRejectedStories() {
+      if (!rejectedStoriesListEl) return;
+      const active = getActiveRejectedStories();
+
+      if (!active.length) {
+        rejectedStoriesListEl.innerHTML = '<div class="rounded-2xl bg-zemin/70 p-4 text-sm text-lacivert/60">Şu an geçici reddedilmiş hikâye yok.</div>';
+        return;
+      }
+
+      rejectedStoriesListEl.innerHTML = active.map(story => {
+        const id = story.id || story.key || '';
+        const text = (story.sanitizedText || story.originalText || '').slice(0, 120).replace(/\n/g, ' ');
+        const remaining = Math.max(0, Math.ceil(((story.expiresAt || 0) - Date.now()) / 60000));
+        return `
+          <div class="rounded-2xl bg-zemin/70 border border-lacivert/10 p-3">
+            <div class="flex items-start justify-between gap-3 mb-3">
+              <span class="text-xs font-semibold text-lacivert">${getTypeLabel(story.storyType)}</span>
+              <span class="text-[11px] uppercase tracking-[0.24em] text-lacivert/60">${remaining} dk</span>
+            </div>
+            <p class="text-sm text-lacivert/80 leading-relaxed mb-3">${text}${(story.sanitizedText || story.originalText || '').length > 120 ? '…' : ''}</p>
+            <div class="flex gap-2">
+              <button onclick="approveRejectedStory('${id}')" class="flex-1 rounded-2xl bg-green-600 text-white text-xs font-semibold py-2 hover:bg-green-700 transition-colors">Onayla</button>
+              <button onclick="restoreRejectedStory('${id}')" class="flex-1 rounded-2xl border border-lacivert/10 bg-white text-lacivert text-xs font-semibold py-2 hover:border-turuncu hover:text-turuncu transition-colors">Beklemede</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function cleanupExpiredRejectedStories() {
+      const now = Date.now();
+      getActiveRejectedStories();
+      rejectedStories.forEach(story => {
+        if (story.expiresAt && story.expiresAt <= now) {
+          rejectedRef.child(story.id || story.key).remove().catch(() => { });
+        }
+      });
+    }
+
+    function updateApprovedEditOptions() {
+      if (!approvedEditSelect) return;
+      approvedEditSelect.innerHTML = '<option value="">Onaylanmış bir hikâye seç</option>';
+
+      const sorted = approvedStories.slice().sort((a, b) => (b.approvedAt || b.createdAt || 0) - (a.approvedAt || a.createdAt || 0));
+      sorted.forEach(story => {
+        const id = story.id || story.key || '';
+        const type = story.forumStoryType || story.storyType || '';
+        const label = `${getTypeLabel(type)} — ${((story.forumStoryText || story.sanitizedText || '').slice(0, 55)).replace(/\n/g, ' ')}${(story.forumStoryText || story.sanitizedText || '').length > 55 ? '…' : ''}`;
+        const option = document.createElement('option');
+        option.value = id;
+        option.textContent = label;
+        approvedEditSelect.appendChild(option);
+      });
+
+      if (!approvedEditSelect.value) {
+        approvedEditText.value = '';
+        approvedEditStatus.textContent = '';
+      }
+    }
+
+    function getApprovedStoryById(id) {
+      return approvedStories.find(story => (story.id || story.key) === id);
+    }
+
+    function handleApprovedEditSelection() {
+      const selectedId = approvedEditSelect.value;
+      const story = getApprovedStoryById(selectedId);
+      approvedEditText.value = story ? (story.forumStoryText || story.sanitizedText || '') : '';
+      approvedEditStatus.textContent = '';
+    }
+
+    async function saveApprovedEdit() {
+      const selectedId = approvedEditSelect.value;
+      if (!selectedId) {
+        approvedEditStatus.textContent = 'Lütfen önce bir hikâye seç.';
+        return;
+      }
+
+      const story = getApprovedStoryById(selectedId);
+      if (!story) {
+        approvedEditStatus.textContent = 'Seçilen hikâye bulunamadı.';
+        return;
+      }
+
+      const newText = approvedEditText.value.trim();
+      if (!newText) {
+        approvedEditStatus.textContent = 'Boş metin kaydedilemez.';
+        return;
+      }
+
+      approvedEditBtn.disabled = true;
+      approvedEditStatus.textContent = 'Kaydediliyor...';
+
+      try {
+        await approvedRef.child(selectedId).update({
+          forumStoryText: newText,
+          sanitizedText: newText,
+          updatedAt: Date.now()
+        });
+
+        approvedEditStatus.textContent = 'Değişiklik kaydedildi.';
+      } catch (error) {
+        console.error('Edit approved story error:', error);
+        approvedEditStatus.textContent = 'Kaydetme sırasında hata oluştu.';
+      } finally {
+        approvedEditBtn.disabled = false;
+      }
+    }
+
+    function getRejectedStoryById(id) {
+      return rejectedStories.find(story => (story.id || story.key) === id);
+    }
+
+    async function approveRejectedStory(id) {
+      const story = getRejectedStoryById(id);
+      if (!story) return;
+
+      const confirmed = confirm('Bu reddedilmiş hikâyeyi doğrudan onaylamak istediğine emin misin?');
+      if (!confirmed) return;
+
+      try {
+        await approvedRef.child(id).set({
+          id,
+          forumStoryType: story.forumStoryType || story.storyType,
+          forumStoryText: story.sanitizedText || story.originalText || '',
+          isAnonymous: !!story.anonymous,
+          originalText: story.originalText || '',
+          sanitizedText: story.sanitizedText || story.originalText || '',
+          createdAt: story.createdAt || Date.now(),
+          approvedAt: Date.now()
+        });
+
+        await rejectedRef.child(id).remove();
+      } catch (error) {
+        console.error('Approve rejected story error:', error);
+        alert('Onaylama sırasında hata oluştu.');
+      }
+    }
+
+    async function restoreRejectedStory(id) {
+      const story = getRejectedStoryById(id);
+      if (!story) return;
+
+      const confirmed = confirm('Bu reddedilmiş hikâyeyi tekrar beklemede statüsüne almak istediğine emin misin?');
+      if (!confirmed) return;
+
+      try {
+        await pendingRef.child(id).set({
+          ...story,
+          status: 'pending',
+          rejectedAt: null,
+          expiresAt: null,
+          movedBackAt: Date.now()
+        });
+
+        await rejectedRef.child(id).remove();
+      } catch (error) {
+        console.error('Restore rejected story error:', error);
+        alert('İşlem sırasında hata oluştu.');
+      }
+    }
+
+    async function routeHotlineReport(id) {
+      const report = hotlineReports.find(item => (item.id || item.key) === id);
+      if (!report) return;
+
+      const confirmed = confirm('Bu ihbarı ekibe yönlendirmek ve arşive taşımak istediğine emin misin?');
+      if (!confirmed) return;
+
+      try {
+        await hotlineReportsRef.child(id).update({
+          archived: true,
+          archivedAt: Date.now()
+        });
+      } catch (error) {
+        console.error('Route hotline report error:', error);
+        alert('İşlem sırasında hata oluştu.');
+      }
+    }
+
+    function updateApprovedEditControls() {
+      const enabled = !!approvedEditSelect && !!approvedEditSelect.value;
+      if (approvedEditBtn) approvedEditBtn.disabled = !enabled;
+      if (approvedRevertBtn) approvedRevertBtn.disabled = !enabled;
+      if (approvedDeleteBtn) approvedDeleteBtn.disabled = !enabled;
+    }
+
+    async function moveApprovedBackToPending() {
+      const selectedId = approvedEditSelect.value;
+      if (!selectedId) {
+        approvedEditStatus.textContent = 'Lütfen önce bir hikâye seç.';
+        return;
+      }
+
+      const story = getApprovedStoryById(selectedId);
+      if (!story) {
+        approvedEditStatus.textContent = 'Seçilen hikâye bulunamadı.';
+        return;
+      }
+
+      const confirmed = confirm('Bu hikâyeyi tekrar beklemede statüsüne almak istediğine emin misin?');
+      if (!confirmed) return;
+
+      approvedRevertBtn.disabled = true;
+      approvedEditStatus.textContent = 'İşlem yapılıyor...';
+
+      try {
+        await pendingRef.child(selectedId).set({
+          ...story,
+          status: 'pending',
+          createdAt: story.createdAt || Date.now(),
+          movedBackAt: Date.now()
+        });
+
+        await approvedRef.child(selectedId).remove();
+        approvedEditStatus.textContent = 'Hikâye tekrar beklemeye alındı.';
+        approvedEditText.value = '';
+        approvedEditSelect.value = '';
+        updateApprovedEditControls();
+      } catch (error) {
+        console.error('Move approved back error:', error);
+        approvedEditStatus.textContent = 'İşlem sırasında hata oluştu.';
+      } finally {
+        approvedRevertBtn.disabled = false;
+      }
+    }
+
+    async function deleteApprovedStory() {
+      const selectedId = approvedEditSelect.value;
+      if (!selectedId) {
+        approvedEditStatus.textContent = 'Lütfen önce bir hikâye seç.';
+        return;
+      }
+
+      const confirmed = confirm('Bu onaylanmış hikâyeyi tamamen silmek istediğine emin misin? Bu işlem geri alınamaz.');
+      if (!confirmed) return;
+
+      approvedDeleteBtn.disabled = true;
+      approvedEditStatus.textContent = 'Siliniyor...';
+
+      try {
+        await approvedRef.child(selectedId).remove();
+        approvedEditStatus.textContent = 'Hikâye silindi.';
+        approvedEditText.value = '';
+        approvedEditSelect.value = '';
+        updateApprovedEditControls();
+      } catch (error) {
+        console.error('Delete approved story error:', error);
+        approvedEditStatus.textContent = 'Silme sırasında hata oluştu.';
+      } finally {
+        approvedDeleteBtn.disabled = false;
+      }
+    }
+
+    if (approvedEditSelect) {
+      approvedEditSelect.addEventListener('change', event => {
+        handleApprovedEditSelection();
+        updateApprovedEditControls();
+      });
+    }
+
+    if (approvedEditBtn) {
+      approvedEditBtn.addEventListener('click', saveApprovedEdit);
+    }
+
+    if (approvedRevertBtn) {
+      approvedRevertBtn.addEventListener('click', moveApprovedBackToPending);
+    }
+
+    if (approvedDeleteBtn) {
+      approvedDeleteBtn.addEventListener('click', deleteApprovedStory);
+    }
+
+    if (hotlineArchiveToggle && hotlineArchiveContent) {
+      hotlineArchiveToggle.addEventListener('click', () => {
+        hotlineArchiveExpanded = !hotlineArchiveExpanded;
+        hotlineArchiveToggle.textContent = hotlineArchiveExpanded ? 'Daralt' : 'Genişlet';
+        hotlineArchiveContent.style.maxHeight = hotlineArchiveExpanded ? '1000px' : '14rem';
+      });
+    }
+
+    function getFilteredStories() {
+      const query = searchInput.value.trim().toLowerCase();
+      const selectedType = typeFilter.value;
+
+      return pendingStories.filter(story => {
+        const textBlock = `${story.originalText || ""} ${story.sanitizedText || ""}`.toLowerCase();
+
+        const matchesSearch = !query || textBlock.includes(query);
+        const matchesType = selectedType === "all" || story.storyType === selectedType;
+        const matchesAnonymous = !anonymousOnly || !!story.anonymous;
+
+        return matchesSearch && matchesType && matchesAnonymous;
+      }).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    }
+
+    function renderStories() {
+      const filtered = getFilteredStories();
+
+      if (!filtered.length) {
+        storiesGrid.innerHTML = "";
+        emptyState.classList.remove("hidden");
+        return;
+      }
+
+      emptyState.classList.add("hidden");
+
+      storiesGrid.innerHTML = filtered.map(story => {
+        const id = story.id || story.key || "";
+        const originalText = escapeHtml(story.originalText || "");
+        const sanitizedText = escapeHtml(story.sanitizedText || story.originalText || "");
+        const typeLabel = getTypeLabel(story.storyType);
+        const typeColor = getTypeColor(story.storyType);
+
+        return `
+          <article class="story-card bg-white border border-lacivert/8 rounded-[2rem] p-5 sm:p-6 shadow-soft">
+            <div class="flex flex-col lg:flex-row gap-5">
+              <div class="flex-1 min-w-0">
+                <div class="flex flex-wrap items-center gap-2 mb-4">
+                  <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${typeColor}">
+                    ${typeLabel}
+                  </span>
+                  <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-turuncu/10 text-turuncu">
+                    Beklemede
+                  </span>
+                  ${story.anonymous ? `
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-lacivert/8 text-lacivert">
+                      Anonim İşaretli
+                    </span>
+                  ` : ""}
+                  <span class="text-lacivert/45 text-xs ml-auto">
+                    ${formatDate(story.createdAt)}
+                  </span>
+                </div>
+
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                  <div class="rounded-2xl bg-zemin/70 border border-lacivert/8 p-4">
+                    <div class="flex items-center gap-2 mb-2">
+                      <i data-lucide="file-text" class="w-4 h-4 text-lacivert/60"></i>
+                      <p class="font-semibold text-sm">Orijinal Metin</p>
+                    </div>
+                    <p class="text-sm text-lacivert/75 leading-relaxed whitespace-pre-wrap">${originalText || "-"}</p>
+                  </div>
+
+                  <div class="rounded-2xl bg-turuncu/5 border border-turuncu/15 p-4">
+                    <div class="flex items-center gap-2 mb-2">
+                      <i data-lucide="shield" class="w-4 h-4 text-turuncu"></i>
+                      <p class="font-semibold text-sm">Sansürlü Metin</p>
+                    </div>
+                    <p class="text-sm text-lacivert/75 leading-relaxed whitespace-pre-wrap">${sanitizedText || "-"}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="w-full lg:w-[210px] flex lg:flex-col gap-3">
+                <button
+                  onclick="approveStory('${id}')"
+                  class="flex-1 lg:w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-green-600 text-white hover:bg-green-700 transition-colors font-semibold"
+                >
+                  <i data-lucide="check" class="w-4 h-4"></i>
+                  Onayla
+                </button>
+
+                <button
+                  onclick="rejectStory('${id}')"
+                  class="flex-1 lg:w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-rose-600 text-white hover:bg-rose-700 transition-colors font-semibold"
+                >
+                  <i data-lucide="x" class="w-4 h-4"></i>
+                  Reddet
+                </button>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join("");
+
+      lucide.createIcons();
+    }
+
+    async function approveStory(id) {
+      const story = pendingStories.find(item => (item.id || item.key) === id);
+      if (!story) return;
+
+      const confirmed = confirm("Bu hikâyeyi yayınlamak istediğine emin misin?");
+      if (!confirmed) return;
+
+      try {
+        await approvedRef.child(id).set({
+          id,
+          forumStoryType: story.storyType,
+          forumStoryText: story.sanitizedText || story.originalText || "",
+          isAnonymous: !!story.anonymous,
+          originalText: story.originalText || "",
+          sanitizedText: story.sanitizedText || story.originalText || "",
+          createdAt: story.createdAt || Date.now(),
+          approvedAt: Date.now()
+        });
+
+        await pendingRef.child(id).remove();
+      } catch (error) {
+        console.error("Approve error:", error);
+        alert("Onay sırasında hata oluştu.");
+      }
+    }
+
+    async function rejectStory(id) {
+      const story = pendingStories.find(item => (item.id || item.key) === id);
+      if (!story) return;
+
+      const confirmed = confirm("Bu hikâyeyi reddetmek istediğine emin misin?");
+      if (!confirmed) return;
+
+      try {
+        await rejectedRef.child(id).set({
+          ...story,
+          rejectedAt: Date.now(),
+          expiresAt: Date.now() + 15 * 60 * 1000,
+          status: 'rejected'
+        });
+
+        await pendingRef.child(id).remove();
+      } catch (error) {
+        console.error("Reject error:", error);
+        alert("Red sırasında hata oluştu.");
+      }
+    }
+
+    window.approveStory = approveStory;
+    window.rejectStory = rejectStory;
+    window.approveRejectedStory = approveRejectedStory;
+    window.restoreRejectedStory = restoreRejectedStory;
+
+    function initMap() {
+      try {
+        const svgText = typeof turkiyeHaritasiSVG !== 'undefined' ? (turkiyeHaritasiSVG.value || turkiyeHaritasiSVG) : '';
+        const mapContainer = document.getElementById('map-container');
+        if (mapContainer && typeof svgText === 'string' && svgText.trim().length > 0) {
+          mapContainer.innerHTML = svgText;
+          const svgMap = mapContainer.querySelector('svg');
+          if (svgMap) {
+            svgMap.setAttribute('id', 'svg-turkiye-haritasi');
+            // Remove hardcoded width/height so it scales properly
+            svgMap.removeAttribute('width');
+            svgMap.removeAttribute('height');
+            svgMap.style.width = '100%';
+            svgMap.style.height = '100%';
+            svgMap.style.overflow = 'visible';
+            setupMapInteractions();
+            // Refresh markers in case reports loaded before map
+            if (hotlineReports.length > 0) {
+              refreshMapMarkers();
+            }
+          }
+        }
+      } catch (err) {
+        console.error("Map loading error:", err);
+      }
+    }
+
+    function setupMapInteractions() {
+      const paths = document.querySelectorAll('#svg-turkiye-haritasi path');
+      paths.forEach(path => {
+        path.addEventListener('click', (e) => {
+          const groupId = path.parentNode ? path.parentNode.id : path.id;
+          if (groupId && groupId !== 'turkiye') {
+            showCityDetails(groupId);
+          }
+        });
+      });
+
+      const closeModal = document.getElementById('close-map-modal');
+      if (closeModal) {
+        closeModal.addEventListener('click', () => {
+          document.getElementById('map-info-modal').classList.add('hidden');
+        });
+      }
+    }
+
+    function normalizeCityName(c) {
+      if (!c) return '';
+      let str = c.trim().toLowerCase();
+      str = str.replace(/i̇/g, 'i').replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ü/g, 'u').replace(/ş/g, 's').replace(/ğ/g, 'g').replace(/ç/g, 'c');
+      return str;
+    }
+
+    function showCityDetails(cityId) {
+      const normalizedId = normalizeCityName(cityId);
+      const cityReports = hotlineReports.filter(r => !r.archived && normalizeCityName(r.city) === normalizedId);
+
+      const modal = document.getElementById('map-info-modal');
+      const cityNameEl = document.getElementById('modal-city-name');
+      const cityCountEl = document.getElementById('modal-city-count');
+      const reportsListEl = document.getElementById('modal-reports-list');
+
+      if (!modal) return;
+
+      const group = document.getElementById(cityId);
+      cityNameEl.textContent = group ? group.getAttribute('data-iladi') || cityId.toUpperCase() : cityId.toUpperCase();
+      cityCountEl.textContent = cityReports.length + " İhbar";
+
+      if (cityReports.length > 0) {
+        reportsListEl.innerHTML = cityReports.sort((a, b) => b.createdAt - a.createdAt).map(report => `
+          <div class="p-3 bg-slate-50 border border-slate-100 rounded-xl">
+            <div class="flex justify-between items-start mb-1">
+              <span class="text-xs font-semibold text-slate-900">${escapeHtml(report.bullyingType || 'Tür belirtilmedi')}</span>
+              <span class="text-[10px] text-slate-500">${formatDate(report.createdAt)}</span>
+            </div>
+            <p class="text-xs text-slate-600 line-clamp-2">${escapeHtml(report.description || report.extraDetails || 'Detay yok')}</p>
+            <div class="mt-2 pt-2 border-t border-slate-100 flex justify-between items-center">
+              <span class="text-[10px] text-slate-400">${report.isAnonymous ? 'Anonim' : 'Açık'}</span>
+              <button onclick="routeHotlineReport('${report.id || report.key}')" class="text-[10px] text-blue-600 hover:text-blue-700 font-semibold">İncele</button>
+            </div>
+          </div>
+        `).join('');
+      } else {
+        reportsListEl.innerHTML = '<p class="text-xs text-slate-500 italic">Bu şehirde aktif ihbar bulunmuyor.</p>';
+      }
+
+      modal.classList.remove('hidden');
+    }
+
+    function refreshMapMarkers() {
+      const svgMap = document.getElementById('svg-turkiye-haritasi');
+      if (!svgMap) return;
+
+      // Remove existing groups added by this function
+      svgMap.querySelectorAll('.map-dot-group').forEach(el => el.remove());
+      svgMap.querySelectorAll('g').forEach(g => {
+        g.classList.remove('has-report');
+        g.classList.remove('city-pulsing');
+      });
+
+      const activeReports = hotlineReports.filter(r => !r.archived);
+      if (activeReports.length === 0) return;
+
+      const cityGroups = {};
+      activeReports.forEach(r => {
+        const c = normalizeCityName(r.city);
+        if (!c) return;
+        if (!cityGroups[c]) cityGroups[c] = [];
+        cityGroups[c].push(r);
+      });
+
+      const svgNS = "http://www.w3.org/2000/svg";
+      let newestReportTime = 0;
+      let pulsingCityId = null;
+      activeReports.forEach(r => {
+        if (r.createdAt > newestReportTime) {
+          newestReportTime = r.createdAt;
+          pulsingCityId = normalizeCityName(r.city);
+        }
+      });
+
+      const now = Date.now();
+      const isNew = (now - newestReportTime) < 30000; // Pulse if newer than 30 seconds
+
+      Object.keys(cityGroups).forEach(cityId => {
+        let path = document.getElementById(cityId);
+
+        // Eğer ID eşleşmezse data-iladi üzerinden deneyelim
+        if (!path) {
+          const allGroups = svgMap.querySelectorAll('g');
+          for (let i = 0; i < allGroups.length; i++) {
+            const attr = allGroups[i].getAttribute('data-iladi');
+            if (attr && normalizeCityName(attr) === cityId) {
+              path = allGroups[i];
+              break;
+            }
+          }
+        }
+
+        if (!path) return;
+
+        path.classList.add('has-report');
+
+        if (isNew && cityId === pulsingCityId) {
+          path.classList.add('city-pulsing');
+        }
+
+        const bbox = path.getBBox();
+        const cx = bbox.x + bbox.width / 2;
+        const cy = bbox.y + bbox.height / 2;
+
+        const g = document.createElementNS(svgNS, 'g');
+        g.setAttribute('class', 'map-dot-group');
+        g.style.pointerEvents = 'none'; // let path receive clicks
+
+        const count = cityGroups[cityId].length;
+        if (count > 0) {
+          const text = document.createElementNS(svgNS, 'text');
+          text.setAttribute('x', cx);
+          text.setAttribute('y', cy + 4);
+          text.setAttribute('text-anchor', 'middle');
+          text.setAttribute('fill', '#991b1b'); // red-800
+          text.setAttribute('font-size', '14px');
+          text.setAttribute('font-weight', '900');
+          text.setAttribute('font-family', 'sans-serif');
+          text.textContent = count;
+          g.appendChild(text);
+        }
+
+        svgMap.appendChild(g);
+      });
+    }
+
+    function bindRealtimeListeners() {
+      pendingRef.on("value", snapshot => {
+        const data = snapshot.val() || {};
+        pendingStories = Object.entries(data).map(([key, value]) => ({
+          key,
+          id: value.id || key,
+          ...value
+        }));
+        updateStats();
+        renderStories();
+      });
+
+      approvedRef.on("value", snapshot => {
+        const data = snapshot.val() || {};
+        approvedStories = Object.values(data);
+        updateStats();
+        updateApprovedEditOptions();
+        updateApprovedEditControls();
+      });
+
+      rejectedRef.on("value", snapshot => {
+        const data = snapshot.val() || {};
+        rejectedStories = Object.values(data);
+        cleanupExpiredRejectedStories();
+        updateStats();
+        renderRejectedStories();
+      });
+
+      hotlineReportsRef.on("value", snapshot => {
+        const data = snapshot.val() || {};
+        hotlineReports = Object.entries(data).map(([key, value]) => ({
+          id: key,
+          ...value
+        }));
+        updateHotlineMap();
+      });
+    }
+
+    searchInput.addEventListener("input", renderStories);
+    typeFilter.addEventListener("change", renderStories);
+
+    anonymousFilterBtn.addEventListener("click", () => {
+      anonymousOnly = !anonymousOnly;
+      anonymousFilterBtn.classList.toggle("pill-active", anonymousOnly);
+      anonymousFilterBtn.textContent = anonymousOnly ? "Anonim Filtre Açık" : "Sadece Anonim";
+      renderStories();
+    });
+
+    refreshBtn.addEventListener("click", () => {
+      renderStories();
+    });
+
+    bindRealtimeListeners();
+    initMap();
+    setInterval(cleanupExpiredRejectedStories, 60 * 1000);
+    lucide.createIcons();
+  </script>
+
+  <!-- AI CHAT BUBBLE -->
+  <button id="ai-chat-bubble" onclick="toggleAIChat()"
+    class="fixed bottom-6 right-6 w-14 h-14 bg-slate-900 text-white rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform z-[90]">
+    <i data-lucide="sparkles" class="w-6 h-6 text-turuncu"></i>
+    <div class="absolute -top-1 -right-1 w-4 h-4 bg-turuncu rounded-full border-2 border-white animate-pulse"></div>
+  </button>
+
+  <!-- AI CHATBOT PANEL -->
+  <div id="ai-chatbot-panel"
+    class="fixed bottom-24 right-6 w-96 h-[500px] bg-white rounded-[2rem] border border-slate-200 z-[100] flex flex-col hidden overflow-hidden">
+    <!-- Header -->
+    <div class="bg-slate-900 p-5 text-white flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
+          <i data-lucide="sparkles" class="w-5 h-5 text-turuncu"></i>
+        </div>
+        <div>
+          <h3 class="font-display font-bold text-lg leading-none">AI İhbar Asistanı</h3>
+          <p class="text-[10px] text-white/60 mt-1 uppercase tracking-wider">Karar Destek Sistemi</p>
+        </div>
+      </div>
+      <button onclick="closeAIChat()" class="text-white/60 hover:text-white transition-colors">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+    </div>
+
+    <!-- Info Banner -->
+    <div class="bg-amber-50 p-3 text-[10px] text-amber-700 border-b border-amber-100 italic text-center">
+      Bu araç yalnızca ön değerlendirme ve karar desteği sağlar.
+    </div>
+
+    <!-- Messages Area -->
+    <div id="ai-chatbot-messages" class="flex-1 overflow-y-auto p-5 space-y-4 scrollbar-thin">
+      <!-- Welcome Message -->
+      <div class="flex gap-3">
+        <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0">
+          <i data-lucide="bot" class="w-4 h-4 text-slate-500"></i>
+        </div>
+        <div class="chat-bubble-ai p-3 rounded-2xl text-xs leading-relaxed max-w-[85%]">
+          Merhaba! Seçtiğiniz ihbarı analiz etmek için hazırım. Nereden başlamak istersiniz?
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div id="ai-chatbot-quick-actions" class="px-4 py-2 flex flex-wrap gap-2 border-t border-slate-100 bg-slate-50/50">
+      <button onclick="quickAskAI('Özetle')"
+        class="px-2 py-1 bg-white border border-slate-200 rounded-lg text-[10px] hover:border-slate-900 transition-colors">Özetle</button>
+      <button onclick="quickAskAI('Riskleri çıkar')"
+        class="px-2 py-1 bg-white border border-slate-200 rounded-lg text-[10px] hover:border-slate-900 transition-colors">Riskleri
+        Çıkar</button>
+      <button onclick="quickAskAI('Aksiyon öner')"
+        class="px-2 py-1 bg-white border border-slate-200 rounded-lg text-[10px] hover:border-slate-900 transition-colors">Aksiyon
+        Öner</button>
+      <button onclick="quickAskAI('Kişisel veri var mı?')"
+        class="px-2 py-1 bg-white border border-slate-200 rounded-lg text-[10px] hover:border-slate-900 transition-colors">Kişisel
+        Veri?</button>
+      <button onclick="quickAskAI('Raporlaştır')"
+        class="px-2.5 py-1.5 bg-slate-900 text-white border border-slate-900 rounded-lg text-[10px] font-bold hover:bg-slate-800 transition-colors">📊
+        Raporlaştır</button>
+    </div>
+
+    <!-- Input Area -->
+    <div class="p-4 bg-white border-t border-slate-100">
+      <div class="relative">
+        <input id="ai-chat-input" type="text" placeholder="Sorunuzu buraya yazın..."
+          class="w-full pl-4 pr-12 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-100">
+        <button onclick="sendChatMessage()"
+          class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-slate-900 text-white rounded-xl flex items-center justify-center hover:bg-slate-800 transition-colors">
+          <i data-lucide="send" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentChatReportId = null;
+
+    function openAIChat(reportId) {
+      currentChatReportId = reportId;
+      const panel = document.getElementById('ai-chatbot-panel');
+      const bubble = document.getElementById('ai-chat-bubble');
+
+      panel.classList.remove('hidden');
+      bubble.classList.add('hidden'); // Hide bubble when chat is open
+
+      const messagesContainer = document.getElementById('ai-chatbot-messages');
+      messagesContainer.innerHTML = `
+        <div class="flex gap-3">
+          <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0">
+            <i data-lucide="bot" class="w-4 h-4 text-slate-500"></i>
+          </div>
+          <div class="chat-bubble-ai p-3 rounded-2xl text-xs leading-relaxed max-w-[85%]">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+              <span class="font-bold">Bağlam Yüklendi</span>
+            </div>
+            Bu ihbar üzerinde çalışmaya hazırım. Neyi analiz etmemi istersiniz?
+          </div>
+        </div>
+      `;
+
+      // Load history from Firebase
+      const report = hotlineReports.find(r => (r.id || r.key) === reportId);
+      if (report && report.chatHistory) {
+        report.chatHistory.forEach(msg => {
+          appendMessageToUI(msg.role, msg.text);
+        });
+      }
+
+      lucide.createIcons();
+    }
+
+    function closeAIChat() {
+      document.getElementById('ai-chatbot-panel').classList.add('hidden');
+      document.getElementById('ai-chat-bubble').classList.remove('hidden');
+      currentChatReportId = null;
+    }
+
+    function toggleAIChat() {
+      const panel = document.getElementById('ai-chatbot-panel');
+      if (panel.classList.contains('hidden')) {
+        // If we have a selected report, open that. If not, just open empty chat.
+        if (currentChatReportId) {
+          openAIChat(currentChatReportId);
+        } else {
+          panel.classList.remove('hidden');
+          document.getElementById('ai-chat-bubble').classList.add('hidden');
+        }
+      } else {
+        closeAIChat();
+      }
+    }
+
+    function appendMessageToUI(role, text) {
+      const container = document.getElementById('ai-chatbot-messages');
+      const div = document.createElement('div');
+      div.className = 'flex gap-3 ' + (role === 'user' ? 'justify-end' : '');
+
+      const inner = role === 'user'
+        ? `<div class="chat-bubble-user p-3 rounded-2xl text-xs leading-relaxed max-w-[85%]">${escapeHtml(text)}</div>`
+        : `<div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0"><i data-lucide="bot" class="w-4 h-4 text-slate-500"></i></div>
+           <div class="chat-bubble-ai p-3 rounded-2xl text-xs leading-relaxed max-w-[85%]">${text.replace(/\n/g, '<br>')}</div>`;
+
+      div.innerHTML = inner;
+      container.appendChild(div);
+      container.scrollTop = container.scrollHeight;
+      lucide.createIcons();
+    }
+
+    async function quickAskAI(text) {
+      document.getElementById('ai-chat-input').value = text;
+      sendChatMessage();
+    }
+
+    window.sendChatMessage = async function() {
+      const input = document.getElementById('ai-chat-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      appendMessageToUI('user', text);
+      input.value = '';
+
+      // Check for report command
+      const lowerText = text.toLowerCase().replace(/Ä±/g, 'i').replace(/ÅŸ/g, 's').replace(/Ã¶/g, 'o').replace(/Ã¼/g, 'u').replace(/Ã§/g, 'c').replace(/ÄŸ/g, 'g');
+      const isReportCmd = lowerText.includes('raporlastir') || lowerText.includes('raporla') || lowerText === 'rapor';
+
+      if (isReportCmd) {
+        await generateFullReport();
+        return;
+      }
+
+      // Check for post-report quick commands
+      if (lowerText.includes('kritikleri listele')) {
+        await handlePostReportCommand('kritik');
+        return;
+      }
+      if (lowerText.includes('sehir yogunlugu') || lowerText.includes('sehir yogunlugunu goster')) {
+        await handlePostReportCommand('sehir');
+        return;
+      }
+      if (lowerText.includes('aksiyon plani') || lowerText.includes('aksiyon plani cikar')) {
+        await handlePostReportCommand('aksiyon');
+        return;
+      }
+
+      // Normal AI chat flow
+      let reportContext = '';
+      let report = null;
+      if (window.currentChatReportId) {
+        report = (window.hotlineReports || []).find(r => (r.id || r.key) === window.currentChatReportId);
+        if (report) {
+          reportContext = '\nIhbar Bilgileri:\nSehir: ' + (report.city || 'Bilinmiyor') + '\nTur: ' + (report.bullyingType || 'Belirtilmemis') + '\nKonum: ' + (report.location || 'Belirtilmemis') + '\nAciklama: ' + (report.description || report.extraDetails || 'Yok');
+          if (report.aiAnalysis) {
+            reportContext += '\nAI On Degerlendirme Ozeti: ' + (report.aiAnalysis.summary || 'Yok') + '\nOncelik: ' + (report.aiAnalysis.severity || report.aiAnalysis.importance || 'Bilinmiyor');
+          }
+        }
+      }
+
+      const fullPrompt = reportContext + '\n\nKullanici Sorusu: ' + text;
+
+      try {
+        const aiResponse = await analyzeReport(fullPrompt, 'chat');
+        appendMessageToUI('ai', aiResponse);
+
+        if (report && window.currentChatReportId) {
+          const history = report.chatHistory || [];
+          history.push({ role: 'user', text: text });
+          history.push({ role: 'ai', text: aiResponse });
+          await window.hotlineReportsRef.child(window.currentChatReportId).update({ chatHistory: history });
+        }
+      } catch (error) {
+        console.error('Chat API hatasi:', error);
+        appendMessageToUI('ai', 'Uzgunum, su anda yanit veremiyorum. Hata: ' + error.message);
+      }
+    }
+
+    window.generateFullReport = async function() {
+      const activeReports = (window.hotlineReports || []).filter(r => !r.archived);
+
+      if (activeReports.length === 0) {
+        appendMessageToUI('ai', 'Su anda raporlanacak aktif ihbar bulunmuyor.');
+        return;
+      }
+
+      appendMessageToUI('ai', 'Aktif ihbarlar taraniyor...');
+      await delay(800);
+
+      appendMessageToUI('ai', 'Toplam <strong>' + activeReports.length + '</strong> aktif ihbar bulundu.');
+      await delay(800);
+
+      appendMessageToUI('ai', 'Ihbarlar onem derecesi, risk turu ve aciliyet durumuna gore analiz ediliyor...');
+
+      const reportData = activeReports.map(r => {
+        const desc = (r.description || r.extraDetails || '').substring(0, 200);
+        return {
+          id: r.id || r.key,
+          createdAt: r.createdAt ? new Date(r.createdAt).toLocaleDateString('tr-TR') : 'Bilinmiyor',
+          city: r.city || 'Bilinmiyor',
+          district: r.district || '',
+          category: r.bullyingType || 'Belirtilmemis',
+          description: desc,
+          status: r.status || 'new',
+          aiImportance: r.aiAnalysis?.severity || r.aiAnalysis?.importance || 'Analiz edilmedi',
+          aiRiskType: r.aiAnalysis?.category || r.aiAnalysis?.riskType || 'Bilinmiyor'
+        };
+      });
+
+      const reportPrompt = 'Aktif Ihbar Verileri:\n' + JSON.stringify(reportData, null, 2);
+
+      try {
+        const reportText = await analyzeReport(reportPrompt, 'report');
+
+        await delay(500);
+        appendMessageToUI('ai', 'Rapor olusturuldu.');
+        await delay(400);
+        appendMessageToUI('ai', reportText);
+        await delay(300);
+        showPostReportActions();
+
+      } catch (error) {
+        console.error('Rapor olusturma hatasi:', error);
+        appendMessageToUI('ai', 'Rapor olusturulurken bir hata olustu. Hata: ' + error.message);
+      }
+    }
+
+    window.handlePostReportCommand = async function(type) {
+      const activeReports = (window.hotlineReports || []).filter(r => !r.archived);
+      if (activeReports.length === 0) {
+        appendMessageToUI('ai', 'Aktif ihbar bulunmuyor.');
+        return;
+      }
+
+      let prompt = '';
+      if (type === 'kritik') {
+        const criticals = activeReports.filter(r => r.aiAnalysis && (r.aiAnalysis.importance === 'critical' || r.aiAnalysis.importance === 'high'));
+        if (criticals.length === 0) {
+          appendMessageToUI('ai', 'Su anda kritik veya yuksek oncelikli ihbar bulunmuyor.');
+          return;
+        }
+        prompt = 'Asagidaki kritik/yuksek oncelikli ihbarlari kisaca listele ve her biri icin onerilen acil aksiyonu belirt. Turkce yanit ver:\n' + JSON.stringify(criticals.map(r => ({ id: r.id, city: r.city, desc: (r.description || '').substring(0, 150), importance: r.aiAnalysis?.importance, risk: r.aiAnalysis?.riskType })), null, 2);
+      } else if (type === 'sehir') {
+        const cityMap = {};
+        activeReports.forEach(r => { const c = r.city || 'Bilinmiyor'; cityMap[c] = (cityMap[c] || 0) + 1; });
+        prompt = 'Asagidaki sehir bazli ihbar dagilimini analiz et, en yogun bolgeleri vurgula ve yogunluk haritasini yorumla. Turkce yanit ver:\n' + JSON.stringify(cityMap, null, 2);
+      } else if (type === 'aksiyon') {
+        prompt = 'Asagidaki aktif ihbarlar icin oncelik sirasina gore bir aksiyon plani olustur. Her adim icin sorumlu birim ve tahmini sure oner. Turkce yanit ver:\n' + JSON.stringify(activeReports.map(r => ({ city: r.city, type: r.bullyingType, desc: (r.description || '').substring(0, 100), importance: r.aiAnalysis?.importance })), null, 2);
+      }
+
+      try {
+        const aiResponse = await analyzeReport(prompt, 'chat');
+        appendMessageToUI('ai', aiResponse);
+      } catch (error) {
+        appendMessageToUI('ai', 'Islem sirasinda bir hata olustu: ' + error.message);
+      }
+    }
+
+    function showPostReportActions() {
+      const container = document.getElementById('ai-chatbot-messages');
+      const div = document.createElement('div');
+      div.className = 'flex flex-wrap gap-2 justify-center my-2';
+      div.innerHTML = '<button onclick="quickAskAI(\'Kritikleri Listele\')" class="px-2.5 py-1.5 bg-red-50 border border-red-200 rounded-lg text-[10px] font-semibold text-red-700 hover:bg-red-100 transition-colors">Kritikleri Listele</button>' +
+        '<button onclick="quickAskAI(\'Sehir Yogunlugunu Goster\')" class="px-2.5 py-1.5 bg-blue-50 border border-blue-200 rounded-lg text-[10px] font-semibold text-blue-700 hover:bg-blue-100 transition-colors">Sehir Yogunlugu</button>' +
+        '<button onclick="quickAskAI(\'Aksiyon Plani Cikar\')" class="px-2.5 py-1.5 bg-emerald-50 border border-emerald-200 rounded-lg text-[10px] font-semibold text-emerald-700 hover:bg-emerald-100 transition-colors">Aksiyon Plani</button>' +
+        '<button onclick="copyLastReport()" class="px-2.5 py-1.5 bg-slate-100 border border-slate-200 rounded-lg text-[10px] font-semibold text-slate-700 hover:bg-slate-200 transition-colors">Raporu Kopyala</button>';
+      container.appendChild(div);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function copyLastReport() {
+      const messages = document.querySelectorAll('#ai-chatbot-messages .chat-bubble-ai');
+      if (messages.length > 0) {
+        const lastMsg = messages[messages.length - 1];
+        const text = lastMsg.innerText || lastMsg.textContent;
+        navigator.clipboard.writeText(text).then(() => {
+          appendMessageToUI('ai', 'Rapor panoya kopyalandi!');
+        }).catch(() => {
+          appendMessageToUI('ai', 'Kopyalama basarisiz oldu. Metni manuel secebilirsiniz.');
+        });
+      }
+    }
+
+    function delay(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    // Input Enter trigger
+    document.getElementById('ai-chat-input')?.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendChatMessage();
+    });
+  </script>
+</body>
+
+</html>

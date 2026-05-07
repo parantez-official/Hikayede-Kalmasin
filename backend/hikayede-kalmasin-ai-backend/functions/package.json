@@ -1,0 +1,17 @@
+{
+  "name": "functions",
+  "description": "Firebase Functions for Hikayede Kalmasin AI Backend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "index.js",
+  "dependencies": {
+    "firebase-admin": "^12.1.1",
+    "firebase-functions": "^5.0.1",
+    "node-fetch": "^3.3.2",
+    "cors": "^2.8.5"
+  },
+  "engines": {
+    "node": "20"
+  }
+}

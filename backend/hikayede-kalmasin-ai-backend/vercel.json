@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/analyze-report.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/analyze-report",
+      "dest": "api/analyze-report.js"
+    }
+  ]
+}
