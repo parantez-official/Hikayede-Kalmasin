@@ -53,7 +53,7 @@ async function callGemini(userPrompt, apiKey, mode) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       contents: [{ parts: [{ text: `${systemPrompt}\n\nInput: ${userPrompt}` }] }],
-      generationConfig: { responseMimeType }
+      generationConfig: { response_mime_type: responseMimeType }
     })
   });
 
