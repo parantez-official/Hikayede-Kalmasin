@@ -9,21 +9,12 @@ const ALLOWED_ORIGINS = [
 ];
 
 export default async function handler(req, res) {
-  // Flexible CORS Handling
-  const origin = req.headers.origin;
-  
-  // Allow any origin from your github.io or local dev
-  if (origin && (origin.includes('github.io') || origin.includes('localhost') || origin.includes('127.0.0.1'))) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  } else {
-    // Fallback for debugging (optional)
-    res.setHeader('Access-Control-Allow-Origin', '*');
-  }
-  
+  // Debug mode: Allow everything
+  res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Access-Control-Max-Age', '86400'); // Cache preflight for 24h
-
+  res.setHeader('Access-Control-Max-Age', '86400');
+  
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }

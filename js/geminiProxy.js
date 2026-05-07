@@ -68,8 +68,9 @@ export async function analyzeReport(userPrompt, mode = 'analyze') {
 
     return await resp.json();
   } catch (e) {
+    console.error("Gemini Proxy Hatası (Detaylı):", e);
     if (e.message !== "Rate limited") {
-      showToast("Analiz servisine ulaşılamıyor. Daha sonra tekrar deneyin.", "error");
+      showToast(`Servis Hatası: ${e.message}`, "error");
     }
     throw e;
   }
