@@ -72,7 +72,9 @@ Language: Turkish for text fields.
     systemPrompt = 'Sen bir raporlama asistanısın. Verilen ihbar listesini analiz et ve Türkçe rapor sun.';
   }
 
-  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+  const cleanApiKey = apiKey ? apiKey.trim() : null;
+
+  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${cleanApiKey}`;
 
   const response = await fetch(endpoint, {
     method: "POST",
