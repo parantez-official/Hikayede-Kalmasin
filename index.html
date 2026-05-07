@@ -1438,11 +1438,6 @@ reportForm.addEventListener('submit', async (e) => {
     reportForm.classList.add('hidden');
     successEl.classList.remove('hidden');
     lucide.createIcons();
-    } else {
-      alert('Hata: Rapor gönderilemedi. Lütfen tekrar deneyin.');
-      submitBtn.disabled = false;
-      document.getElementById('submitBtnText').textContent = 'Bildir';
-    }
   } catch (err) {
     console.error('Report submission error:', err);
     alert('Bir hata oluştu. Lütfen tekrar deneyin.');
