@@ -1406,26 +1406,27 @@ reportForm.addEventListener('submit', async (e) => {
   };
   
   try {
-    const result = await window.dataSdk.create(reportData);
-   await fetch("https://formspree.io/f/mkopdaze", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-    "Accept": "application/json"
-  },
-  body: JSON.stringify({
-    subject: "Yeni Bildirim Geldi 🚨",
-    bullyingType,
-    location,
-    description,
-    incidentAddress,
-    contactNumber,
-    extraDetails,
-    isAnonymous: isAnonymous ? "Evet" : "Hayır"
-  })
-});
+    // Formspree (E-posta bildirimi)
+    await fetch("https://formspree.io/f/mkopdaze", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify({
+        subject: "Yeni Bildirim Geldi 🚨",
+        bullyingType,
+        location,
+        description,
+        incidentAddress,
+        contactNumber,
+        extraDetails,
+        isAnonymous: isAnonymous ? "Evet" : "Hayır"
+      })
+    });
     
-    if (result.isOk) {
+    // Doğrudan Firebase ve AI işlemlerine geç
+    if (true) { 
       let aiAnalysis = null;
       try {
         const { analyzeReport } = await import('./js/geminiProxy.js');
