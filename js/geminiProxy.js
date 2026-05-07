@@ -2,7 +2,7 @@
  * Configuration – replace with your Vercel backend URL.
  * Example: "https://hikayede-kalmasin-ai-backend.vercel.app"
  */
-const BACKEND_URL = "https://hikayede-kalmasin-ai-backend.vercel.app";
+const BACKEND_URL = "https://hikayede-kalmasin-e3vi.vercel.app";
 
 /**
  * Show a temporary toast message.
