@@ -1,22 +1,15 @@
 import fetch from 'node-fetch';
 
-// CORS Configuration
-const ALLOWED_ORIGINS = [
-  'https://parantez-official.github.io',
-  'https://hikayede-kalmasin.github.io',
-  'http://localhost:5500',
-  'http://127.0.0.1:5500'
-];
-
 export default async function handler(req, res) {
-  // Debug mode: Allow everything
+  // Ultra-Aggressive CORS
+  res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Access-Control-Max-Age', '86400');
-  
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization');
+
   if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+    res.status(200).end();
+    return;
   }
 
   if (req.method !== 'POST') {
@@ -28,12 +21,8 @@ export default async function handler(req, res) {
 
   if (!apiKey || apiKey.trim() === "" || apiKey === "undefined") {
     return res.status(500).json({ 
-      error: 'Backend Hatası: GEMINI_API_KEY bulunamadı veya boş. Lütfen Vercel ayarlarından değişkeni ekleyip "vercel --prod" ile tekrar yükleyin.' 
+      error: 'Backend Hatası: GEMINI_API_KEY bulunamadı. Lütfen Vercel panelinden Environment Variables kısmına GEMINI_API_KEY ekleyin.' 
     });
-  }
-
-  if (!prompt || typeof prompt !== 'string') {
-    return res.status(400).json({ error: 'Missing prompt' });
   }
 
   try {
@@ -50,28 +39,13 @@ async function callGemini(userPrompt, apiKey, mode) {
   let responseMimeType = "text/plain";
 
   if (mode === 'analyze') {
-    systemPrompt = `
-Analyze the supplied bullying report and return JSON:
-{
-  "summary": string,
-  "severity": "low" | "medium" | "high" | "critical",
-  "category": "physical_bullying" | "cyberbullying" | "harassment" | "self_harm_risk" | "emergency" | "spam_fake" | "other",
-  "recommended_action": string,
-  "risk_score": number,
-  "is_emergency": boolean,
-  "admin_note": string
-}
-Language: Turkish for text fields.
-`;
+    systemPrompt = `Analyze bullying report and return JSON: { "summary": string, "severity": "low"|"medium"|"high"|"critical", "category": string, "recommended_action": string, "risk_score": number, "is_emergency": boolean, "admin_note": string } Turkish language.`;
     responseMimeType = "application/json";
-  } else if (mode === 'chat') {
-    systemPrompt = 'Sen bir ihbar analiz asistanısın. Türkçe yanıt ver. Kısa ve öz ol.';
-  } else if (mode === 'report') {
-    systemPrompt = 'Sen bir raporlama asistanısın. Verilen ihbar listesini analiz et ve Türkçe rapor sun.';
+  } else {
+    systemPrompt = 'Sen bir asistansın. Türkçe yanıt ver.';
   }
 
-  const cleanApiKey = apiKey ? apiKey.trim() : null;
-
+  const cleanApiKey = apiKey.trim();
   const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${cleanApiKey}`;
 
   const response = await fetch(endpoint, {
@@ -84,12 +58,11 @@ Language: Turkish for text fields.
   });
 
   if (!response.ok) {
-    const err = await response.text();
-    throw new Error(`Gemini Error: ${response.status}`);
+    const errText = await response.text();
+    throw new Error(`Google API Hatası: ${response.status}`);
   }
 
   const data = await response.json();
   const text = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
-
   return responseMimeType === "application/json" ? JSON.parse(text) : text;
 }
