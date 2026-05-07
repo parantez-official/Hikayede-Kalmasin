@@ -46,7 +46,7 @@ async function callGemini(userPrompt, apiKey, mode) {
   }
 
   const cleanApiKey = apiKey.trim();
-  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${cleanApiKey}`;
+  const endpoint = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${cleanApiKey}`;
 
   const response = await fetch(endpoint, {
     method: "POST",
